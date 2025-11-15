@@ -105,6 +105,14 @@ export default function FlashcardGame({ category, onBack, onCategoryChange }: Fl
     history: '🏛️',
     science: '🔬',
     'fine-arts': '🎨',
+    religion: '🕊️',
+    mythology: '⚡',
+    philosophy: '🤔',
+    'social-science': '📊',
+    'current-events': '📰',
+    geography: '🌍',
+    'other-academic': '🎯',
+    'pop-culture': '🎬',
   };
 
   return (

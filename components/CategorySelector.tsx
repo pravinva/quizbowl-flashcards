@@ -75,7 +75,7 @@ export default function CategorySelector({
     'current-events': '📰',
     geography: '🌍',
     'other-academic': '🎯',
-    trash: '🎬',
+    'pop-culture': '🎬',
   };
 
   return (
