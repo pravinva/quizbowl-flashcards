@@ -52,6 +52,13 @@ export default function Home() {
             />
           )}
         </div>
+
+        {/* Credits Footer */}
+        <div className="text-center mt-12 pb-4">
+          <p className="text-sm" style={{ color: '#6b7280' }}>
+            Created by Pravin using Claude Code and QBReader
+          </p>
+        </div>
       </div>
     </main>
   );
