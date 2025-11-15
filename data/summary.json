@@ -3,53 +3,53 @@
   "categories": [
     {
       "category": "Literature",
-      "count": 1000
+      "count": 0
     },
     {
       "category": "History",
-      "count": 1000
+      "count": 0
     },
     {
       "category": "Science",
-      "count": 1000
+      "count": 0
     },
     {
       "category": "Fine Arts",
-      "count": 1000
+      "count": 0
     },
     {
       "category": "Religion",
-      "count": 1000
+      "count": 0
     },
     {
       "category": "Mythology",
-      "count": 1000
+      "count": 0
     },
     {
       "category": "Philosophy",
-      "count": 1000
+      "count": 0
     },
     {
       "category": "Social Science",
-      "count": 1000
+      "count": 0
     },
     {
       "category": "Current Events",
-      "count": 1000
+      "count": 0
     },
     {
       "category": "Geography",
-      "count": 1000
+      "count": 0
     },
     {
       "category": "Other Academic",
-      "count": 1000
+      "count": 0
     },
     {
       "category": "Pop Culture",
-      "count": 1000
+      "count": 0
     }
   ],
-  "totalBonuses": 12000,
-  "fetchedAt": "2025-11-15T14:23:16.146Z"
+  "totalBonuses": 0,
+  "fetchedAt": "2025-11-15T16:00:46.083Z"
 }
