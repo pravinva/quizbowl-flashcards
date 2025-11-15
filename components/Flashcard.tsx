@@ -58,18 +58,20 @@ export default function Flashcard({ bonus }: FlashcardProps) {
       {/* Flashcard */}
       <div
         onClick={handleFlip}
-        className="relative min-h-[300px] cursor-pointer perspective-1000"
+        className="relative min-h-[300px] cursor-pointer"
+        style={{ perspective: '1000px' }}
       >
         <div
-          className={`relative w-full h-full transition-transform duration-500 transform-style-3d ${
-            flipped ? 'rotate-y-180' : ''
-          }`}
+          className={`relative w-full h-full transition-transform duration-500`}
+          style={{
+            transformStyle: 'preserve-3d',
+            transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
+          }}
         >
           {/* Front - Question */}
           <div
-            className={`absolute w-full h-full backface-hidden ${
-              flipped ? 'invisible' : 'visible'
-            }`}
+            className="absolute w-full h-full"
+            style={{ backfaceVisibility: 'hidden' }}
           >
             <div className="p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg border-2 border-gray-300 dark:border-gray-700 min-h-[300px] flex flex-col justify-between">
               <div>
@@ -93,9 +95,11 @@ export default function Flashcard({ bonus }: FlashcardProps) {
 
           {/* Back - Answer */}
           <div
-            className={`absolute w-full h-full backface-hidden rotate-y-180 ${
-              flipped ? 'visible' : 'invisible'
-            }`}
+            className="absolute w-full h-full"
+            style={{
+              backfaceVisibility: 'hidden',
+              transform: 'rotateY(180deg)',
+            }}
           >
             <div className="p-8 bg-green-50 dark:bg-green-900/20 rounded-xl shadow-lg border-2 border-green-300 dark:border-green-700 min-h-[300px] flex flex-col justify-between">
               <div>
