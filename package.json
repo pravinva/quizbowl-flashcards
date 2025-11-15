@@ -1,0 +1,37 @@
+{
+  "name": "quizbowl-flashcards",
+  "version": "1.0.0",
+  "description": "Quizbowl flashcard app for practicing bonuses",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint",
+    "fetch-data": "tsx scripts/fetchBonuses.ts"
+  },
+  "keywords": [
+    "quizbowl",
+    "flashcards",
+    "education"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@types/node": "^24.10.1",
+    "@types/react": "^19.2.5",
+    "@types/react-dom": "^19.2.3",
+    "firebase": "^12.6.0",
+    "next": "^16.0.3",
+    "react": "^19.2.0",
+    "react-dom": "^19.2.0",
+    "typescript": "^5.9.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/postcss": "^4.1.17",
+    "autoprefixer": "^10.4.22",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.17",
+    "tsx": "^4.20.6"
+  }
+}

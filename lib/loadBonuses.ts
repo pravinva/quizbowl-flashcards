@@ -1,0 +1,68 @@
+/**
+ * Utility functions for loading bonus data
+ */
+
+import type { Bonus, CategoryInfo } from '@/types/quizbowl';
+import { promises as fs } from 'fs';
+import path from 'path';
+
+const DATA_DIR = path.join(process.cwd(), 'data');
+
+/**
+ * Get available categories from the data directory
+ */
+export async function getCategories(): Promise<CategoryInfo[]> {
+  try {
+    const summaryPath = path.join(DATA_DIR, 'summary.json');
+    const summaryContent = await fs.readFile(summaryPath, 'utf-8');
+    const summary = JSON.parse(summaryContent);
+
+    return summary.categories.map((cat: any) => ({
+      id: cat.category.toLowerCase().replace(/\s+/g, '-'),
+      name: cat.category,
+      count: cat.count,
+    }));
+  } catch (error) {
+    console.error('Error loading categories:', error);
+    return [];
+  }
+}
+
+/**
+ * Load bonuses for a specific category
+ */
+export async function loadBonusesByCategory(
+  categoryId: string
+): Promise<Bonus[]> {
+  try {
+    const fileName = `${categoryId}.json`;
+    const filePath = path.join(DATA_DIR, fileName);
+    const fileContent = await fs.readFile(filePath, 'utf-8');
+    return JSON.parse(fileContent);
+  } catch (error) {
+    console.error(`Error loading bonuses for category ${categoryId}:`, error);
+    return [];
+  }
+}
+
+/**
+ * Check if data directory exists and has data
+ */
+export async function hasData(): Promise<boolean> {
+  try {
+    await fs.access(DATA_DIR);
+    const summaryPath = path.join(DATA_DIR, 'summary.json');
+    await fs.access(summaryPath);
+    return true;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Get a random subset of bonuses
+ */
+export function getRandomBonuses(bonuses: Bonus[], count: number): Bonus[] {
+  const shuffled = [...bonuses].sort(() => Math.random() - 0.5);
+  return shuffled.slice(0, count);
+}
