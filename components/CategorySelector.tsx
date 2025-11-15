@@ -63,25 +63,56 @@ export default function CategorySelector({
     );
   }
 
-  return (
-    <div className="space-y-4">
-      <p className="text-center text-gray-600 dark:text-gray-400">
-        Select a category to start practicing:
-      </p>
+  const categoryEmojis: Record<string, string> = {
+    literature: '📚',
+    history: '🏛️',
+    science: '🔬',
+    'fine-arts': '🎨',
+    religion: '🕊️',
+    mythology: '⚡',
+    philosophy: '🤔',
+    'social-science': '📊',
+    'current-events': '📰',
+    geography: '🌍',
+    'other-academic': '🎯',
+    trash: '🎬',
+  };
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+  return (
+    <div className="space-y-6">
+      <div className="text-center">
+        <p className="text-lg text-gray-700 dark:text-gray-300 font-medium">
+          Choose your category to begin
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
         {categories.map((category) => (
           <button
             key={category.id}
             onClick={() => onSelectCategory(category.id)}
-            className="p-6 rounded-lg border-2 border-gray-300 dark:border-gray-700 hover:border-blue-500 dark:hover:border-blue-400 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all duration-200 text-left group"
+            className="group relative p-6 rounded-2xl bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 hover:border-transparent hover:shadow-2xl hover:scale-105 transition-all duration-300 text-left overflow-hidden"
           >
-            <h3 className="text-xl font-semibold mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400">
-              {category.name}
-            </h3>
-            <p className="text-sm text-gray-600 dark:text-gray-400">
-              {category.count} bonuses
-            </p>
+            {/* Gradient overlay on hover */}
+            <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+
+            {/* Content */}
+            <div className="relative z-10">
+              <div className="flex items-center gap-3 mb-3">
+                <span className="text-3xl transform group-hover:scale-110 transition-transform duration-300">
+                  {categoryEmojis[category.id] || '📖'}
+                </span>
+                <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 group-hover:text-white transition-colors duration-300">
+                  {category.name}
+                </h3>
+              </div>
+              <div className="flex items-center gap-2">
+                <div className="w-2 h-2 rounded-full bg-blue-500 group-hover:bg-white transition-colors duration-300"></div>
+                <p className="text-sm text-gray-600 dark:text-gray-400 group-hover:text-white/90 transition-colors duration-300 font-medium">
+                  {category.count} bonuses available
+                </p>
+              </div>
+            </div>
           </button>
         ))}
       </div>

@@ -32,37 +32,38 @@ export default function Flashcard({ bonus }: FlashcardProps) {
   const part = bonus.parts[currentPart];
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Bonus metadata */}
-      <div className="text-sm text-gray-600 dark:text-gray-400 space-y-1">
-        <p>
-          <span className="font-semibold">Category:</span> {bonus.category}
-          {bonus.subcategory && ` - ${bonus.subcategory}`}
-        </p>
-        <p>
-          <span className="font-semibold">Set:</span> {bonus.set.name} (
-          {bonus.set.year})
-        </p>
+      <div className="flex flex-wrap gap-3 justify-center">
+        <div className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full text-white text-sm font-semibold shadow-lg">
+          {bonus.category}
+          {bonus.subcategory && ` • ${bonus.subcategory}`}
+        </div>
+        <div className="px-4 py-2 bg-white dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 text-sm font-medium border-2 border-gray-200 dark:border-gray-700 shadow-md">
+          📅 {bonus.set.name} ({bonus.set.year})
+        </div>
       </div>
 
       {/* Lead-in (shown only on first part) */}
       {currentPart === 0 && bonus.leadin && (
-        <div className="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
-          <p className="text-sm font-semibold text-blue-900 dark:text-blue-300 mb-2">
-            Lead-in:
+        <div className="relative p-6 bg-gradient-to-r from-blue-50 to-purple-50 dark:from-blue-900/30 dark:to-purple-900/30 rounded-2xl border-2 border-blue-200 dark:border-blue-800 shadow-lg">
+          <div className="absolute -top-3 left-6 px-3 py-1 bg-gradient-to-r from-blue-600 to-purple-600 rounded-full text-white text-xs font-bold shadow-md">
+            💡 Lead-in
+          </div>
+          <p className="text-gray-800 dark:text-gray-200 mt-2 leading-relaxed">
+            {bonus.leadin}
           </p>
-          <p className="text-gray-800 dark:text-gray-200">{bonus.leadin}</p>
         </div>
       )}
 
       {/* Flashcard */}
       <div
         onClick={handleFlip}
-        className="relative min-h-[300px] cursor-pointer"
-        style={{ perspective: '1000px' }}
+        className="relative min-h-[350px] cursor-pointer group"
+        style={{ perspective: '1200px' }}
       >
         <div
-          className={`relative w-full h-full transition-transform duration-500`}
+          className={`relative w-full h-full transition-all duration-700 ease-out`}
           style={{
             transformStyle: 'preserve-3d',
             transform: flipped ? 'rotateY(180deg)' : 'rotateY(0deg)',
@@ -73,23 +74,25 @@ export default function Flashcard({ bonus }: FlashcardProps) {
             className="absolute w-full h-full"
             style={{ backfaceVisibility: 'hidden' }}
           >
-            <div className="p-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg border-2 border-gray-300 dark:border-gray-700 min-h-[300px] flex flex-col justify-between">
+            <div className="p-10 bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-900/20 rounded-3xl shadow-2xl border-2 border-blue-200 dark:border-blue-800 min-h-[350px] flex flex-col justify-between transform hover:shadow-blue-300/50 dark:hover:shadow-blue-900/50 transition-all duration-300">
               <div>
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-sm font-semibold text-blue-600 dark:text-blue-400">
-                    Part {currentPart + 1} of {bonus.parts.length}
+                <div className="flex justify-between items-center mb-6">
+                  <span className="px-4 py-1.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-bold rounded-full shadow-lg">
+                    ❓ Part {currentPart + 1} of {bonus.parts.length}
                   </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {part.value} points
+                  <span className="px-3 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300 text-xs font-semibold rounded-full">
+                    {part.value} pts
                   </span>
                 </div>
-                <p className="text-lg text-gray-800 dark:text-gray-200">
+                <p className="text-xl leading-relaxed text-gray-800 dark:text-gray-100 font-medium">
                   {part.question}
                 </p>
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 text-center mt-4">
-                Click to reveal answer
-              </p>
+              <div className="text-center mt-6">
+                <p className="text-sm text-gray-500 dark:text-gray-400 font-medium animate-pulse">
+                  👆 Click to reveal answer
+                </p>
+              </div>
             </div>
           </div>
 
@@ -101,23 +104,25 @@ export default function Flashcard({ bonus }: FlashcardProps) {
               transform: 'rotateY(180deg)',
             }}
           >
-            <div className="p-8 bg-green-50 dark:bg-green-900/20 rounded-xl shadow-lg border-2 border-green-300 dark:border-green-700 min-h-[300px] flex flex-col justify-between">
+            <div className="p-10 bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/20 rounded-3xl shadow-2xl border-2 border-green-300 dark:border-green-700 min-h-[350px] flex flex-col justify-between transform hover:shadow-green-300/50 dark:hover:shadow-green-900/50 transition-all duration-300">
               <div>
-                <div className="flex justify-between items-center mb-4">
-                  <span className="text-sm font-semibold text-green-600 dark:text-green-400">
-                    Answer - Part {currentPart + 1}
+                <div className="flex justify-between items-center mb-6">
+                  <span className="px-4 py-1.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white text-sm font-bold rounded-full shadow-lg">
+                    ✅ Answer - Part {currentPart + 1}
                   </span>
-                  <span className="text-xs text-gray-500 dark:text-gray-400">
-                    {part.value} points
+                  <span className="px-3 py-1 bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300 text-xs font-semibold rounded-full">
+                    {part.value} pts
                   </span>
                 </div>
-                <p className="text-lg font-semibold text-gray-800 dark:text-gray-200">
+                <p className="text-2xl font-bold text-gray-900 dark:text-white leading-relaxed">
                   {part.answer}
                 </p>
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 text-center mt-4">
-                Click to see question again
-              </p>
+              <div className="text-center mt-6">
+                <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
+                  👆 Click to see question again
+                </p>
+              </div>
             </div>
           </div>
         </div>
@@ -125,15 +130,15 @@ export default function Flashcard({ bonus }: FlashcardProps) {
 
       {/* Part navigation */}
       {bonus.parts.length > 1 && (
-        <div className="flex justify-center gap-4">
+        <div className="flex justify-center gap-4 items-center">
           <button
             onClick={handlePreviousPart}
             disabled={currentPart === 0}
-            className="px-4 py-2 text-sm bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-6 py-3 text-sm font-semibold bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-gray-300 dark:disabled:hover:border-gray-600 transition-all duration-300 transform hover:scale-105"
           >
-            Previous Part
+            ← Previous
           </button>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-3 px-4 py-2 bg-white dark:bg-gray-800 rounded-xl border-2 border-gray-200 dark:border-gray-700 shadow-md">
             {bonus.parts.map((_, index) => (
               <button
                 key={index}
@@ -141,9 +146,9 @@ export default function Flashcard({ bonus }: FlashcardProps) {
                   setCurrentPart(index);
                   setFlipped(false);
                 }}
-                className={`w-3 h-3 rounded-full transition-colors ${
+                className={`w-4 h-4 rounded-full transition-all duration-300 transform hover:scale-125 ${
                   index === currentPart
-                    ? 'bg-blue-600 dark:bg-blue-400'
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg scale-110'
                     : 'bg-gray-300 dark:bg-gray-600 hover:bg-gray-400 dark:hover:bg-gray-500'
                 }`}
                 aria-label={`Go to part ${index + 1}`}
@@ -153,9 +158,9 @@ export default function Flashcard({ bonus }: FlashcardProps) {
           <button
             onClick={handleNextPart}
             disabled={currentPart === bonus.parts.length - 1}
-            className="px-4 py-2 text-sm bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            className="px-6 py-3 text-sm font-semibold bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl hover:from-blue-700 hover:to-purple-700 hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:from-blue-600 disabled:hover:to-purple-600 transition-all duration-300 transform hover:scale-105 shadow-md"
           >
-            Next Part
+            Next →
           </button>
         </div>
       )}

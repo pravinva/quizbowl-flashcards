@@ -81,35 +81,37 @@ export default function FlashcardGame({ category, onBack }: FlashcardGameProps) 
   const currentBonus = bonuses[currentIndex];
 
   return (
-    <div className="space-y-6">
-      <div className="flex justify-between items-center">
+    <div className="space-y-8">
+      {/* Header with back button and progress */}
+      <div className="flex justify-between items-center backdrop-blur-sm bg-white/50 dark:bg-gray-800/50 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 shadow-lg">
         <button
           onClick={onBack}
-          className="px-4 py-2 text-blue-600 dark:text-blue-400 hover:underline"
+          className="px-5 py-2.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl font-semibold border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-lg transition-all duration-300 transform hover:scale-105"
         >
-          ← Back to Categories
+          ← Categories
         </button>
-        <span className="text-gray-600 dark:text-gray-400">
-          {currentIndex + 1} / {bonuses.length}
-        </span>
+        <div className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold shadow-lg">
+          Question {currentIndex + 1} of {bonuses.length}
+        </div>
       </div>
 
       <Flashcard bonus={currentBonus} />
 
-      <div className="flex justify-between items-center">
+      {/* Navigation buttons */}
+      <div className="flex justify-between items-center gap-4">
         <button
           onClick={handlePrevious}
           disabled={currentIndex === 0}
-          className="px-6 py-2 bg-gray-200 dark:bg-gray-700 text-gray-800 dark:text-gray-200 rounded-lg hover:bg-gray-300 dark:hover:bg-gray-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 px-8 py-4 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-2xl font-bold border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-xl disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-gray-300 dark:disabled:hover:border-gray-600 transition-all duration-300 transform hover:scale-105"
         >
-          Previous
+          ⬅️ Previous Bonus
         </button>
         <button
           onClick={handleNext}
           disabled={currentIndex === bonuses.length - 1}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+          className="flex-1 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-bold hover:from-blue-700 hover:to-purple-700 hover:shadow-xl disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:from-blue-600 disabled:hover:to-purple-600 transition-all duration-300 transform hover:scale-105 shadow-lg"
         >
-          Next
+          Next Bonus ➡️
         </button>
       </div>
     </div>
