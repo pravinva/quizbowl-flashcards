@@ -29,6 +29,21 @@ export async function getCategories(): Promise<CategoryInfo[]> {
 }
 
 /**
+ * Transform QBReader bonus format to our internal format
+ */
+function transformBonus(rawBonus: any): Bonus {
+  return {
+    ...rawBonus,
+    parts: rawBonus.parts.map((question: string, index: number) => ({
+      question: rawBonus.parts[index],
+      answer: rawBonus.answers[index],
+      value: rawBonus.values[index],
+      difficultyModifier: rawBonus.difficultyModifiers?.[index],
+    })),
+  };
+}
+
+/**
  * Load bonuses for a specific category
  */
 export async function loadBonusesByCategory(
@@ -38,7 +53,10 @@ export async function loadBonusesByCategory(
     const fileName = `${categoryId}.json`;
     const filePath = path.join(DATA_DIR, fileName);
     const fileContent = await fs.readFile(filePath, 'utf-8');
-    return JSON.parse(fileContent);
+    const rawBonuses = JSON.parse(fileContent);
+
+    // Transform the raw QBReader format to our expected format
+    return rawBonuses.map(transformBonus);
   } catch (error) {
     console.error(`Error loading bonuses for category ${categoryId}:`, error);
     return [];
