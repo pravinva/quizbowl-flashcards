@@ -55,8 +55,8 @@ export default function CategorySelector({
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100"></div>
-        <p className="mt-4 text-gray-600 dark:text-gray-400">
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-4" style={{ borderColor: '#2563eb', borderTopColor: 'transparent' }}></div>
+        <p className="mt-4 text-xl font-bold" style={{ color: '#2563eb' }}>
           Loading categories...
         </p>
       </div>
@@ -78,43 +78,58 @@ export default function CategorySelector({
     'pop-culture': '🎬',
   };
 
+  const categoryColors: Record<string, { bg: string; text: string }> = {
+    literature: { bg: '#3b82f6', text: '#ffffff' },
+    history: { bg: '#10b981', text: '#ffffff' },
+    science: { bg: '#8b5cf6', text: '#ffffff' },
+    'fine-arts': { bg: '#ec4899', text: '#ffffff' },
+    religion: { bg: '#06b6d4', text: '#ffffff' },
+    mythology: { bg: '#f59e0b', text: '#ffffff' },
+    philosophy: { bg: '#6366f1', text: '#ffffff' },
+    'social-science': { bg: '#14b8a6', text: '#ffffff' },
+    'current-events': { bg: '#ef4444', text: '#ffffff' },
+    geography: { bg: '#22c55e', text: '#ffffff' },
+    'other-academic': { bg: '#a855f7', text: '#ffffff' },
+    'pop-culture': { bg: '#f97316', text: '#ffffff' },
+  };
+
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <p className="text-lg text-gray-700 dark:text-gray-300 font-medium">
-          Choose your category to begin
+    <div className="space-y-8">
+      <div className="text-center p-6 rounded-3xl shadow-xl" style={{ backgroundColor: '#2563eb' }}>
+        <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>
+          Choose Your Category
+        </p>
+        <p className="text-lg mt-2" style={{ color: '#bfdbfe' }}>
+          Select a category to start practicing
         </p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5">
-        {categories.map((category) => (
-          <button
-            key={category.id}
-            onClick={() => onSelectCategory(category.id)}
-            className="group relative p-6 rounded-2xl bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-700 hover:border-transparent hover:shadow-2xl hover:scale-105 transition-all duration-300 text-left overflow-hidden"
-          >
-            {/* Gradient overlay on hover */}
-            <div className="absolute inset-0 bg-gradient-to-br from-blue-500 to-purple-600 opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl"></div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+        {categories.map((category) => {
+          const colors = categoryColors[category.id] || { bg: '#2563eb', text: '#ffffff' };
 
-            {/* Content */}
-            <div className="relative z-10">
-              <div className="flex items-center gap-3 mb-3">
-                <span className="text-3xl transform group-hover:scale-110 transition-transform duration-300">
+          return (
+            <button
+              key={category.id}
+              onClick={() => onSelectCategory(category.id)}
+              className="p-6 rounded-2xl shadow-xl transform hover:scale-105 transition-all duration-300"
+              style={{ backgroundColor: colors.bg }}
+            >
+              <div className="flex flex-col items-center gap-3">
+                <span className="text-5xl">
                   {categoryEmojis[category.id] || '📖'}
                 </span>
-                <h3 className="text-xl font-bold text-gray-800 dark:text-gray-100 group-hover:text-white transition-colors duration-300">
+                <h3 className="text-xl font-bold text-center" style={{ color: colors.text }}>
                   {category.name}
                 </h3>
-              </div>
-              <div className="flex items-center gap-2">
-                <div className="w-2 h-2 rounded-full bg-blue-500 group-hover:bg-white transition-colors duration-300"></div>
-                <p className="text-sm text-gray-600 dark:text-gray-400 group-hover:text-white/90 transition-colors duration-300 font-medium">
-                  {category.count} bonuses available
+                <div className="w-full h-px" style={{ backgroundColor: 'rgba(255,255,255,0.3)' }}></div>
+                <p className="text-sm font-semibold" style={{ color: 'rgba(255,255,255,0.9)' }}>
+                  {category.count} bonuses
                 </p>
               </div>
-            </div>
-          </button>
-        ))}
+            </button>
+          );
+        })}
       </div>
     </div>
   );
