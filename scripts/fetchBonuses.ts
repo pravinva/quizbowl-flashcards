@@ -38,7 +38,7 @@ async function fetchBonuses(options: FetchOptions = {}): Promise<Bonus[]> {
   const {
     category,
     subcategory,
-    maxReturnLength = 1000,
+    maxReturnLength = 5000,
     minYear = 2010,
     maxYear = new Date().getFullYear(),
   } = options;
@@ -89,7 +89,7 @@ async function fetchAllBonuses(): Promise<Map<string, Bonus[]>> {
   const RATE_LIMIT_DELAY = 100;
 
   for (const category of CATEGORIES) {
-    const bonuses = await fetchBonuses({ category, maxReturnLength: 1000 });
+    const bonuses = await fetchBonuses({ category, maxReturnLength: 5000 });
     allBonuses.set(category, bonuses);
 
     // Wait to respect rate limit
