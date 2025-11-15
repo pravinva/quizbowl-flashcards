@@ -8,8 +8,8 @@ export default function Home() {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
   return (
-    <main className="min-h-screen p-8" style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%)' }}>
-      <div className="max-w-7xl mx-auto">
+    <main className="min-h-screen px-6 py-8 md:px-12 md:py-12 lg:px-16 lg:py-16" style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%)' }}>
+      <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-12">
           <div className="inline-block mb-6 p-4 rounded-3xl shadow-2xl" style={{ backgroundColor: '#2563eb' }}>
