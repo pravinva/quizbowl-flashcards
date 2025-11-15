@@ -59,7 +59,7 @@ export default function Flashcard({ bonus }: FlashcardProps) {
       {/* Flashcard */}
       <div
         onClick={handleFlip}
-        className="relative min-h-[350px] cursor-pointer group"
+        className="relative cursor-pointer group"
         style={{ perspective: '1200px' }}
       >
         <div
@@ -74,9 +74,9 @@ export default function Flashcard({ bonus }: FlashcardProps) {
             className="absolute w-full h-full"
             style={{ backfaceVisibility: 'hidden' }}
           >
-            <div className="p-10 bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-900/20 rounded-3xl shadow-2xl border-2 border-blue-200 dark:border-blue-800 min-h-[350px] flex flex-col justify-between transform hover:shadow-blue-300/50 dark:hover:shadow-blue-900/50 transition-all duration-300">
+            <div className="p-8 bg-gradient-to-br from-white to-blue-50 dark:from-gray-800 dark:to-blue-900/20 rounded-3xl shadow-xl border-2 border-blue-200 dark:border-blue-800 flex flex-col justify-between transform hover:shadow-2xl hover:scale-[1.02] hover:border-blue-400 dark:hover:border-blue-600 transition-all duration-300">
               <div>
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex justify-between items-center mb-4">
                   <span className="px-4 py-1.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white text-sm font-bold rounded-full shadow-lg">
                     ❓ Part {currentPart + 1} of {bonus.parts.length}
                   </span>
@@ -84,11 +84,11 @@ export default function Flashcard({ bonus }: FlashcardProps) {
                     {part.value} pts
                   </span>
                 </div>
-                <p className="text-xl leading-relaxed text-gray-800 dark:text-gray-100 font-medium">
+                <p className="text-lg leading-relaxed text-gray-800 dark:text-gray-100 font-medium">
                   {part.question}
                 </p>
               </div>
-              <div className="text-center mt-6">
+              <div className="text-center mt-4">
                 <p className="text-sm text-gray-500 dark:text-gray-400 font-medium animate-pulse">
                   👆 Click to reveal answer
                 </p>
@@ -104,9 +104,9 @@ export default function Flashcard({ bonus }: FlashcardProps) {
               transform: 'rotateY(180deg)',
             }}
           >
-            <div className="p-10 bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/20 rounded-3xl shadow-2xl border-2 border-green-300 dark:border-green-700 min-h-[350px] flex flex-col justify-between transform hover:shadow-green-300/50 dark:hover:shadow-green-900/50 transition-all duration-300">
+            <div className="p-8 bg-gradient-to-br from-green-50 to-emerald-100 dark:from-green-900/30 dark:to-emerald-900/20 rounded-3xl shadow-xl border-2 border-green-300 dark:border-green-700 flex flex-col justify-between transform hover:shadow-2xl hover:scale-[1.02] hover:border-green-500 dark:hover:border-green-600 transition-all duration-300">
               <div>
-                <div className="flex justify-between items-center mb-6">
+                <div className="flex justify-between items-center mb-4">
                   <span className="px-4 py-1.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white text-sm font-bold rounded-full shadow-lg">
                     ✅ Answer - Part {currentPart + 1}
                   </span>
@@ -118,7 +118,7 @@ export default function Flashcard({ bonus }: FlashcardProps) {
                   {part.answer}
                 </p>
               </div>
-              <div className="text-center mt-6">
+              <div className="text-center mt-4">
                 <p className="text-sm text-gray-600 dark:text-gray-400 font-medium">
                   👆 Click to see question again
                 </p>
