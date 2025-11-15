@@ -72,10 +72,10 @@ export default function BonusFilters({ onFilterChange }: BonusFiltersProps) {
           {/* Year Range */}
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <label className="text-sm font-bold" style={{ color: '#1e40af' }}>
+              <label className="text-base font-bold" style={{ color: '#1e40af', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
                 📅 Year Range
               </label>
-              <span className="text-sm font-semibold" style={{ color: '#3b82f6' }}>
+              <span className="text-base font-bold" style={{ color: '#2563eb', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
                 {pendingMinYear} - {pendingMaxYear}
               </span>
             </div>
@@ -103,83 +103,83 @@ export default function BonusFilters({ onFilterChange }: BonusFiltersProps) {
 
           {/* Difficulty Level */}
           <div className="space-y-3">
-            <label className="text-sm font-bold" style={{ color: '#1e40af' }}>
+            <label className="text-base font-bold" style={{ color: '#1e40af', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
               🎓 Difficulty Level
             </label>
             <div className="space-y-2">
-              <label className="flex items-center gap-3 p-3 rounded-xl border-2 border-gray-200 hover:border-blue-400 cursor-pointer transition-all bg-white">
+              <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-blue-400 cursor-pointer transition-all bg-white">
                 <input
                   type="radio"
                   name="difficulty"
                   value="all"
                   checked={pendingDifficulty === 'all'}
                   onChange={() => setPendingDifficulty('all')}
-                  className="w-4 h-4 text-blue-600"
+                  className="w-5 h-5"
                   style={{ accentColor: '#2563eb' }}
                 />
                 <div className="flex-1">
-                  <div className="font-semibold text-gray-700">All Levels</div>
-                  <div className="text-xs text-gray-500">No filtering • All tournaments</div>
+                  <div className="font-bold text-base" style={{ color: '#1f2937', fontFamily: 'system-ui, -apple-system, sans-serif' }}>All Levels</div>
+                  <div className="text-sm font-medium" style={{ color: '#6b7280', fontFamily: 'system-ui, -apple-system, sans-serif' }}>No filtering • All tournaments</div>
                 </div>
                 {appliedDifficulty === 'all' && (
-                  <span className="text-green-600 font-bold">✓</span>
+                  <span className="font-bold text-xl" style={{ color: '#10b981' }}>✓</span>
                 )}
               </label>
 
-              <label className="flex items-center gap-3 p-3 rounded-xl border-2 border-gray-200 hover:border-green-400 cursor-pointer transition-all bg-white">
+              <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-green-400 cursor-pointer transition-all bg-white">
                 <input
                   type="radio"
                   name="difficulty"
                   value="easy"
                   checked={pendingDifficulty === 'easy'}
                   onChange={() => setPendingDifficulty('easy')}
-                  className="w-4 h-4"
+                  className="w-5 h-5"
                   style={{ accentColor: '#10b981' }}
                 />
                 <div className="flex-1">
-                  <div className="font-semibold text-gray-700">🟢 Easy / High School</div>
-                  <div className="text-xs text-gray-500">Difficulty 1-4 • Novice, MS, HS</div>
+                  <div className="font-bold text-base" style={{ color: '#1f2937', fontFamily: 'system-ui, -apple-system, sans-serif' }}>🟢 Easy / High School</div>
+                  <div className="text-sm font-medium" style={{ color: '#6b7280', fontFamily: 'system-ui, -apple-system, sans-serif' }}>Difficulty 1-4 • Novice, MS, HS</div>
                 </div>
                 {appliedDifficulty === 'easy' && (
-                  <span className="text-green-600 font-bold">✓</span>
+                  <span className="font-bold text-xl" style={{ color: '#10b981' }}>✓</span>
                 )}
               </label>
 
-              <label className="flex items-center gap-3 p-3 rounded-xl border-2 border-gray-200 hover:border-yellow-400 cursor-pointer transition-all bg-white">
+              <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-yellow-400 cursor-pointer transition-all bg-white">
                 <input
                   type="radio"
                   name="difficulty"
                   value="medium"
                   checked={pendingDifficulty === 'medium'}
                   onChange={() => setPendingDifficulty('medium')}
-                  className="w-4 h-4"
+                  className="w-5 h-5"
                   style={{ accentColor: '#f59e0b' }}
                 />
                 <div className="flex-1">
-                  <div className="font-semibold text-gray-700">🟡 Medium</div>
-                  <div className="text-xs text-gray-500">Difficulty 5-7 • Challenging HS, easier College</div>
+                  <div className="font-bold text-base" style={{ color: '#1f2937', fontFamily: 'system-ui, -apple-system, sans-serif' }}>🟡 Medium</div>
+                  <div className="text-sm font-medium" style={{ color: '#6b7280', fontFamily: 'system-ui, -apple-system, sans-serif' }}>Difficulty 5-7 • Challenging HS, easier College</div>
                 </div>
                 {appliedDifficulty === 'medium' && (
-                  <span className="text-green-600 font-bold">✓</span>
+                  <span className="font-bold text-xl" style={{ color: '#10b981' }}>✓</span>
                 )}
               </label>
 
-              <label className="flex items-center gap-3 p-3 rounded-xl border-2 border-gray-200 hover:border-red-400 cursor-pointer transition-all bg-white">
+              <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-red-400 cursor-pointer transition-all bg-white">
                 <input
                   type="radio"
                   name="difficulty"
                   value="hard"
                   checked={pendingDifficulty === 'hard'}
                   onChange={() => setPendingDifficulty('hard')}
-                  className="w-4 h-4"
+                  className="w-5 h-5"
                   style={{ accentColor: '#ef4444' }}
                 />
                 <div className="flex-1">
-                  <div className="font-semibold text-gray-700">🔴 Hard / College</div>
-                  <div className="text-xs text-gray-500">Difficulty 8-10 • College, Open</div>
+                  <div className="font-bold text-base" style={{ color: '#1f2937', fontFamily: 'system-ui, -apple-system, sans-serif' }}>🔴 Hard / College</div>
+                  <div className="text-sm font-medium" style={{ color: '#6b7280', fontFamily: 'system-ui, -apple-system, sans-serif' }}>Difficulty 8-10 • College, Open</div>
                 </div>
                 {appliedDifficulty === 'hard' && (
-                  <span className="text-green-600 font-bold">✓</span>
+                  <span className="font-bold text-xl" style={{ color: '#10b981' }}>✓</span>
                 )}
               </label>
             </div>
