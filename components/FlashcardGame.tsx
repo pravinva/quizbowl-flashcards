@@ -18,7 +18,7 @@ export default function FlashcardGame({ category, onBack, onCategoryChange }: Fl
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<CategoryInfo[]>([]);
   const [filters, setFilters] = useState<FilterOptions>({
-    minYear: 2010,
+    minYear: 2022,
     maxYear: new Date().getFullYear(),
     difficultyLevel: 'all',
   });

@@ -16,12 +16,12 @@ export default function BonusFilters({ onFilterChange }: BonusFiltersProps) {
   const currentYear = new Date().getFullYear();
 
   // Pending filters (what user has selected but not applied)
-  const [pendingMinYear, setPendingMinYear] = useState(2010);
+  const [pendingMinYear, setPendingMinYear] = useState(2022);
   const [pendingMaxYear, setPendingMaxYear] = useState(currentYear);
   const [pendingDifficulty, setPendingDifficulty] = useState<'all' | 'easy' | 'medium' | 'hard'>('all');
 
   // Applied filters (what's actually filtering the data)
-  const [appliedMinYear, setAppliedMinYear] = useState(2010);
+  const [appliedMinYear, setAppliedMinYear] = useState(2022);
   const [appliedMaxYear, setAppliedMaxYear] = useState(currentYear);
   const [appliedDifficulty, setAppliedDifficulty] = useState<'all' | 'easy' | 'medium' | 'hard'>('all');
 
@@ -40,13 +40,13 @@ export default function BonusFilters({ onFilterChange }: BonusFiltersProps) {
   };
 
   const handleReset = () => {
-    setPendingMinYear(2010);
+    setPendingMinYear(2022);
     setPendingMaxYear(currentYear);
     setPendingDifficulty('all');
-    setAppliedMinYear(2010);
+    setAppliedMinYear(2022);
     setAppliedMaxYear(currentYear);
     setAppliedDifficulty('all');
-    onFilterChange({ minYear: 2010, maxYear: currentYear, difficultyLevel: 'all' });
+    onFilterChange({ minYear: 2022, maxYear: currentYear, difficultyLevel: 'all' });
   };
 
   return (
@@ -82,7 +82,7 @@ export default function BonusFilters({ onFilterChange }: BonusFiltersProps) {
             <div className="space-y-2">
               <input
                 type="range"
-                min="2010"
+                min="2022"
                 max={currentYear}
                 value={pendingMinYear}
                 onChange={(e) => setPendingMinYear(Math.min(Number(e.target.value), pendingMaxYear))}
@@ -91,7 +91,7 @@ export default function BonusFilters({ onFilterChange }: BonusFiltersProps) {
               />
               <input
                 type="range"
-                min="2010"
+                min="2022"
                 max={currentYear}
                 value={pendingMaxYear}
                 onChange={(e) => setPendingMaxYear(Math.max(Number(e.target.value), pendingMinYear))}
