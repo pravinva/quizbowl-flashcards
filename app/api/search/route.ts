@@ -2,93 +2,116 @@ import { NextRequest, NextResponse } from 'next/server';
 import { loadBonusesByCategory } from '@/lib/loadBonuses';
 import type { Bonus } from '@/types/quizbowl';
 
-// Concept mappings for semantic understanding (free, no API needed!)
-const conceptMap: Record<string, string[]> = {
-  'baroque': ['baroque', 'bach', 'vivaldi', 'handel', 'fugue', 'concerto grosso', '17th century', '18th century'],
-  'france': ['french', 'france', 'parisian', 'louis', 'versailles'],
-  'musician': ['composer', 'music', 'symphony', 'opera', 'song', 'piece'],
-  'artist': ['painter', 'painting', 'sculpture', 'art', 'canvas', 'portrait'],
-  'writer': ['author', 'wrote', 'novel', 'poem', 'book', 'literature'],
-  'scientist': ['scientist', 'discovered', 'theory', 'experiment', 'research'],
-  'war': ['battle', 'military', 'fought', 'army', 'conflict', 'campaign'],
-  'ancient': ['ancient', 'classical', 'greco-roman', 'antiquity'],
-  'renaissance': ['renaissance', 'medici', 'humanism', '15th century', '16th century'],
-  'american': ['united states', 'american', 'usa', 'u.s.'],
-};
-
 // Helper to create searchable text from a bonus
 function createBonusText(bonus: Bonus): string {
   const parts = bonus.parts?.map(p => `${p.question} ${p.answer}`).join(' ') || '';
   return `${bonus.leadin} ${parts} ${bonus.category} ${bonus.subcategory} ${bonus.set?.name || ''}`.toLowerCase();
 }
 
-// Expand query with related concepts
-function expandQuery(query: string): string[] {
-  const queryLower = query.toLowerCase();
-  const words = queryLower.split(/\s+/);
-  const expandedTerms = new Set(words);
+// Generate n-grams from text for fuzzy matching
+function getNGrams(text: string, n: number): Set<string> {
+  const ngrams = new Set<string>();
+  const words = text.toLowerCase().split(/\s+/).filter(w => w.length > 0);
 
-  // Add related concepts
   for (const word of words) {
-    for (const [concept, related] of Object.entries(conceptMap)) {
-      if (word.includes(concept) || concept.includes(word)) {
-        related.forEach(term => expandedTerms.add(term));
+    if (word.length >= n) {
+      for (let i = 0; i <= word.length - n; i++) {
+        ngrams.add(word.substring(i, i + n));
       }
     }
   }
 
-  return Array.from(expandedTerms);
+  return ngrams;
 }
 
-// Smart semantic search using concept expansion (FREE - no API needed!)
+// Calculate fuzzy similarity between two strings using n-grams
+function fuzzyMatch(str1: string, str2: string): number {
+  const ngrams1 = getNGrams(str1, 3);
+  const ngrams2 = getNGrams(str2, 3);
+
+  if (ngrams1.size === 0 || ngrams2.size === 0) return 0;
+
+  let intersection = 0;
+  for (const gram of ngrams1) {
+    if (ngrams2.has(gram)) intersection++;
+  }
+
+  const union = ngrams1.size + ngrams2.size - intersection;
+  return union > 0 ? intersection / union : 0;
+}
+
+// Adaptive semantic search that learns from the data (FREE - no hardcoded concepts!)
 function semanticSearch(bonuses: Bonus[], query: string, useSemanticMode: boolean): Bonus[] {
   const queryLower = query.toLowerCase();
   const queryWords = queryLower.split(/\s+/).filter(w => w.length > 2);
-
-  // Expand query with semantic concepts if in semantic mode
-  const searchTerms = useSemanticMode ? expandQuery(query) : queryWords;
 
   // Score each bonus
   const scored = bonuses.map(bonus => {
     const text = createBonusText(bonus);
     let score = 0;
 
-    // Exact phrase match gets highest score
+    // 1. EXACT PHRASE MATCH (highest priority)
     if (text.includes(queryLower)) {
-      score += 200;
+      score += 300;
     }
 
-    // Count matching terms
-    for (const term of searchTerms) {
-      if (term.length < 2) continue;
+    // 2. EXACT WORD MATCHES
+    for (const word of queryWords) {
+      // Exact word match
+      const exactRegex = new RegExp(`\\b${word}\\b`, 'gi');
+      const exactMatches = text.match(exactRegex) || [];
+      score += exactMatches.length * 50;
 
-      const regex = new RegExp(`\\b${term}\\w*`, 'gi');
-      const matches = text.match(regex) || [];
-      const count = matches.length;
+      // Partial word match (e.g., "music" matches "musician")
+      const partialRegex = new RegExp(`\\b\\w*${word}\\w*\\b`, 'gi');
+      const partialMatches = text.match(partialRegex) || [];
+      score += (partialMatches.length - exactMatches.length) * 20;
+    }
 
-      // Higher score for exact matches
-      if (queryWords.includes(term)) {
-        score += count * 15;
-      } else {
-        // Lower score for expanded concept matches
-        score += count * 8;
+    // 3. SEMANTIC MODE: Fuzzy matching and context understanding
+    if (useSemanticMode) {
+      // Fuzzy match on category/subcategory (catches related terms)
+      const categoryText = `${bonus.category} ${bonus.subcategory}`.toLowerCase();
+      const fuzzyScore = fuzzyMatch(queryLower, categoryText);
+      score += fuzzyScore * 100;
+
+      // Look for any words that are similar to query words
+      const allWords = text.split(/\s+/);
+      for (const word of queryWords) {
+        for (const textWord of allWords) {
+          if (textWord.length > 3 && word.length > 3) {
+            const similarity = fuzzyMatch(word, textWord);
+            if (similarity > 0.5) {
+              score += similarity * 30;
+            }
+          }
+        }
+      }
+
+      // Multi-word query bonus (rewards matching context)
+      if (queryWords.length > 1) {
+        const wordMatches = queryWords.filter(word => text.includes(word)).length;
+        if (wordMatches > 1) {
+          score += wordMatches * 40; // Strong bonus for multiple matches
+        }
       }
     }
 
-    // Boost for category/subcategory matches
-    if (bonus.category?.toLowerCase().includes(queryLower)) score += 80;
-    if (bonus.subcategory?.toLowerCase().includes(queryLower)) score += 80;
+    // 4. CATEGORY/SUBCATEGORY DIRECT MATCHES
+    if (bonus.category?.toLowerCase().includes(queryLower)) score += 100;
+    if (bonus.subcategory?.toLowerCase().includes(queryLower)) score += 100;
 
-    // Bonus for matching multiple query words
-    const wordMatches = queryWords.filter(word => text.includes(word)).length;
-    if (wordMatches > 1) {
-      score += wordMatches * 25;
+    // 5. ANSWER FIELD PRIORITY (answers often contain key terms)
+    for (const part of bonus.parts || []) {
+      if (part.answer?.toLowerCase().includes(queryLower)) {
+        score += 80;
+      }
     }
 
     return { bonus, score };
   });
 
-  // Return top matches
+  // Return top matches, sorted by relevance
   return scored
     .filter(item => item.score > 0)
     .sort((a, b) => b.score - a.score)
