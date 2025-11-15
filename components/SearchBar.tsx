@@ -13,20 +13,23 @@ export default function SearchBar({ onSearch, onClear, placeholder = 'Ask anythi
   const [isActive, setIsActive] = useState(false);
   const [semanticMode, setSemanticMode] = useState(true);
 
-  const handleSearch = (value: string) => {
+  const handleInputChange = (value: string) => {
     setQuery(value);
-    if (value.trim().length >= 2) {
-      onSearch(value.trim(), semanticMode);
-      setIsActive(true);
-    } else if (value.trim().length === 0) {
+    if (value.trim().length === 0) {
       handleClear();
     }
   };
 
-  const handleKeyPress = (e: React.KeyboardEvent) => {
-    if (e.key === 'Enter' && query.trim().length >= 2) {
+  const executeSearch = () => {
+    if (query.trim().length >= 2) {
       onSearch(query.trim(), semanticMode);
       setIsActive(true);
+    }
+  };
+
+  const handleKeyPress = (e: React.KeyboardEvent) => {
+    if (e.key === 'Enter') {
+      executeSearch();
     }
   };
 
@@ -37,9 +40,10 @@ export default function SearchBar({ onSearch, onClear, placeholder = 'Ask anythi
   };
 
   const toggleMode = () => {
-    setSemanticMode(!semanticMode);
+    const newMode = !semanticMode;
+    setSemanticMode(newMode);
     if (isActive && query.trim().length >= 2) {
-      onSearch(query.trim(), !semanticMode);
+      onSearch(query.trim(), newMode);
     }
   };
 
@@ -55,7 +59,7 @@ export default function SearchBar({ onSearch, onClear, placeholder = 'Ask anythi
           <input
             type="text"
             value={query}
-            onChange={(e) => handleSearch(e.target.value)}
+            onChange={(e) => handleInputChange(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder={placeholder}
             className="w-full outline-none bg-transparent font-medium text-base sm:text-base min-h-[40px] sm:min-h-0"
@@ -67,6 +71,13 @@ export default function SearchBar({ onSearch, onClear, placeholder = 'Ask anythi
           />
         </div>
         <div className="flex items-center gap-2 justify-end sm:justify-start">
+          <button
+            onClick={executeSearch}
+            disabled={query.trim().length < 2}
+            className="px-4 py-2.5 sm:px-3 sm:py-1.5 bg-blue-600 text-white text-sm sm:text-xs font-bold rounded-lg hover:bg-blue-700 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            Search
+          </button>
           <button
             onClick={toggleMode}
             className={`px-4 py-2.5 sm:px-3 sm:py-1.5 text-sm sm:text-xs font-bold rounded-lg transition-all ${
