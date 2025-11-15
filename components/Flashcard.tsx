@@ -59,12 +59,12 @@ export default function Flashcard({ bonus }: FlashcardProps) {
 
       {/* Lead-in - BLUE */}
       {bonus.leadin && (
-        <div className="p-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl shadow-2xl transform hover:scale-[1.01] transition-all">
+        <div className="p-8 rounded-3xl shadow-2xl transform hover:scale-[1.01] transition-all" style={{ backgroundColor: '#2563eb' }}>
           <div className="flex items-center gap-2 mb-4">
             <span className="text-2xl">💡</span>
-            <h3 className="text-white text-xl font-bold">Lead-in</h3>
+            <h3 className="text-xl font-bold" style={{ color: '#ffffff' }}>Lead-in</h3>
           </div>
-          <p className="text-white text-lg leading-relaxed font-medium">
+          <p className="text-lg leading-relaxed font-medium" style={{ color: '#ffffff' }}>
             {bonus.leadin}
           </p>
         </div>
@@ -74,12 +74,12 @@ export default function Flashcard({ bonus }: FlashcardProps) {
       {bonus.parts[0] && (
         <div className="space-y-4">
           {/* Question - Light Blue */}
-          <div className="p-8 bg-gradient-to-br from-blue-200 to-blue-300 rounded-3xl shadow-2xl transform hover:scale-[1.01] transition-all">
+          <div className="p-8 rounded-3xl shadow-2xl transform hover:scale-[1.01] transition-all" style={{ backgroundColor: '#bfdbfe' }}>
             <div className="flex items-center gap-2 mb-4">
               <span className="text-2xl">❓</span>
-              <h3 className="text-blue-900 text-xl font-bold">Part 1 • {bonus.parts[0].value} points</h3>
+              <h3 className="text-xl font-bold" style={{ color: '#1e3a8a' }}>Part 1 • {bonus.parts[0].value} points</h3>
             </div>
-            <p className="text-blue-900 text-lg leading-relaxed font-semibold">
+            <p className="text-lg leading-relaxed font-semibold" style={{ color: '#1e3a8a' }}>
               {bonus.parts[0].question}
             </p>
           </div>
@@ -89,19 +89,19 @@ export default function Flashcard({ bonus }: FlashcardProps) {
             onClick={() => toggleReveal(0)}
             className="w-full text-left"
           >
-            <div className={`p-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl shadow-2xl transition-all transform ${
-              revealedParts.has(0) ? 'scale-[1.02] shadow-blue-500/50' : 'hover:scale-[1.01]'
-            }`}>
+            <div className={`p-8 rounded-3xl shadow-2xl transition-all transform ${
+              revealedParts.has(0) ? 'scale-[1.02]' : 'hover:scale-[1.01]'
+            }`} style={{ backgroundColor: '#2563eb' }}>
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-2xl">✅</span>
-                <h3 className="text-white text-xl font-bold">Answer 1</h3>
+                <h3 className="text-xl font-bold" style={{ color: '#ffffff' }}>Answer 1</h3>
               </div>
               {revealedParts.has(0) ? (
-                <p className="text-white text-2xl font-bold leading-relaxed">
+                <p className="text-2xl font-bold leading-relaxed" style={{ color: '#ffffff' }}>
                   {bonus.parts[0].answer}
                 </p>
               ) : (
-                <p className="text-blue-200 text-center text-lg font-semibold animate-pulse">
+                <p className="text-center text-lg font-semibold animate-pulse" style={{ color: '#bfdbfe' }}>
                   👆 Click to reveal answer
                 </p>
               )}
@@ -114,12 +114,12 @@ export default function Flashcard({ bonus }: FlashcardProps) {
       {bonus.parts[1] && (
         <div className="space-y-4">
           {/* Question - Light Green */}
-          <div className="p-8 bg-gradient-to-br from-green-200 to-green-300 rounded-3xl shadow-2xl transform hover:scale-[1.01] transition-all">
+          <div className="p-8 rounded-3xl shadow-2xl transform hover:scale-[1.01] transition-all" style={{ backgroundColor: '#bbf7d0' }}>
             <div className="flex items-center gap-2 mb-4">
               <span className="text-2xl">❓</span>
-              <h3 className="text-green-900 text-xl font-bold">Part 2 • {bonus.parts[1].value} points</h3>
+              <h3 className="text-xl font-bold" style={{ color: '#14532d' }}>Part 2 • {bonus.parts[1].value} points</h3>
             </div>
-            <p className="text-green-900 text-lg leading-relaxed font-semibold">
+            <p className="text-lg leading-relaxed font-semibold" style={{ color: '#14532d' }}>
               {bonus.parts[1].question}
             </p>
           </div>
@@ -129,19 +129,19 @@ export default function Flashcard({ bonus }: FlashcardProps) {
             onClick={() => toggleReveal(1)}
             className="w-full text-left"
           >
-            <div className={`p-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl shadow-2xl transition-all transform ${
-              revealedParts.has(1) ? 'scale-[1.02] shadow-blue-500/50' : 'hover:scale-[1.01]'
-            }`}>
+            <div className={`p-8 rounded-3xl shadow-2xl transition-all transform ${
+              revealedParts.has(1) ? 'scale-[1.02]' : 'hover:scale-[1.01]'
+            }`} style={{ backgroundColor: '#2563eb' }}>
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-2xl">✅</span>
-                <h3 className="text-white text-xl font-bold">Answer 2</h3>
+                <h3 className="text-xl font-bold" style={{ color: '#ffffff' }}>Answer 2</h3>
               </div>
               {revealedParts.has(1) ? (
-                <p className="text-white text-2xl font-bold leading-relaxed">
+                <p className="text-2xl font-bold leading-relaxed" style={{ color: '#ffffff' }}>
                   {bonus.parts[1].answer}
                 </p>
               ) : (
-                <p className="text-blue-200 text-center text-lg font-semibold animate-pulse">
+                <p className="text-center text-lg font-semibold animate-pulse" style={{ color: '#bfdbfe' }}>
                   👆 Click to reveal answer
                 </p>
               )}
@@ -154,12 +154,12 @@ export default function Flashcard({ bonus }: FlashcardProps) {
       {bonus.parts[2] && (
         <div className="space-y-4">
           {/* Question - Light Red/Pink */}
-          <div className="p-8 bg-gradient-to-br from-red-200 to-red-300 rounded-3xl shadow-2xl transform hover:scale-[1.01] transition-all">
+          <div className="p-8 rounded-3xl shadow-2xl transform hover:scale-[1.01] transition-all" style={{ backgroundColor: '#fecaca' }}>
             <div className="flex items-center gap-2 mb-4">
               <span className="text-2xl">❓</span>
-              <h3 className="text-red-900 text-xl font-bold">Part 3 • {bonus.parts[2].value} points</h3>
+              <h3 className="text-xl font-bold" style={{ color: '#7f1d1d' }}>Part 3 • {bonus.parts[2].value} points</h3>
             </div>
-            <p className="text-red-900 text-lg leading-relaxed font-semibold">
+            <p className="text-lg leading-relaxed font-semibold" style={{ color: '#7f1d1d' }}>
               {bonus.parts[2].question}
             </p>
           </div>
@@ -169,19 +169,19 @@ export default function Flashcard({ bonus }: FlashcardProps) {
             onClick={() => toggleReveal(2)}
             className="w-full text-left"
           >
-            <div className={`p-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl shadow-2xl transition-all transform ${
-              revealedParts.has(2) ? 'scale-[1.02] shadow-blue-500/50' : 'hover:scale-[1.01]'
-            }`}>
+            <div className={`p-8 rounded-3xl shadow-2xl transition-all transform ${
+              revealedParts.has(2) ? 'scale-[1.02]' : 'hover:scale-[1.01]'
+            }`} style={{ backgroundColor: '#2563eb' }}>
               <div className="flex items-center gap-2 mb-4">
                 <span className="text-2xl">✅</span>
-                <h3 className="text-white text-xl font-bold">Answer 3</h3>
+                <h3 className="text-xl font-bold" style={{ color: '#ffffff' }}>Answer 3</h3>
               </div>
               {revealedParts.has(2) ? (
-                <p className="text-white text-2xl font-bold leading-relaxed">
+                <p className="text-2xl font-bold leading-relaxed" style={{ color: '#ffffff' }}>
                   {bonus.parts[2].answer}
                 </p>
               ) : (
-                <p className="text-blue-200 text-center text-lg font-semibold animate-pulse">
+                <p className="text-center text-lg font-semibold animate-pulse" style={{ color: '#bfdbfe' }}>
                   👆 Click to reveal answer
                 </p>
               )}
