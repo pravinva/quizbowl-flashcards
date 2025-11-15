@@ -32,12 +32,16 @@ export async function getCategories(): Promise<CategoryInfo[]> {
  * Transform QBReader bonus format to our internal format
  */
 function transformBonus(rawBonus: any): Bonus {
+  // Some bonuses from QBReader may be missing values, answers, or other fields
+  // We need to handle these cases gracefully
+  const partsCount = Array.isArray(rawBonus.parts) ? rawBonus.parts.length : 0;
+
   return {
     ...rawBonus,
-    parts: rawBonus.parts.map((question: string, index: number) => ({
-      question: rawBonus.parts[index],
-      answer: rawBonus.answers[index],
-      value: rawBonus.values[index],
+    parts: Array.from({ length: partsCount }, (_, index) => ({
+      question: rawBonus.parts?.[index] || '',
+      answer: rawBonus.answers?.[index] || 'Answer not available',
+      value: rawBonus.values?.[index] || 10, // Default to 10 points if missing
       difficultyModifier: rawBonus.difficultyModifiers?.[index],
     })),
   };
