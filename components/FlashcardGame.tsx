@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import Flashcard from './Flashcard';
 import BonusFilters, { type FilterOptions } from './BonusFilters';
+import SearchBar from './SearchBar';
 import type { Bonus, CategoryInfo } from '@/types/quizbowl';
 
 interface FlashcardGameProps {
@@ -17,6 +18,7 @@ export default function FlashcardGame({ category, onBack, onCategoryChange }: Fl
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<CategoryInfo[]>([]);
+  const [searchQuery, setSearchQuery] = useState('');
   const [filters, setFilters] = useState<FilterOptions>({
     minYear: 2022,
     maxYear: new Date().getFullYear(),
@@ -66,8 +68,24 @@ export default function FlashcardGame({ category, onBack, onCategoryChange }: Fl
     }
   };
 
-  const applyFilters = (bonusesToFilter: Bonus[], filterOptions: FilterOptions) => {
+  const applyFilters = (bonusesToFilter: Bonus[], filterOptions: FilterOptions, query = searchQuery) => {
     let filtered = bonusesToFilter;
+
+    // Filter by search query
+    if (query.trim().length >= 2) {
+      const lowerQuery = query.toLowerCase();
+      filtered = filtered.filter(bonus => {
+        // Search in leadin
+        if (bonus.leadin?.toLowerCase().includes(lowerQuery)) return true;
+
+        // Search in parts (questions and answers)
+        return bonus.parts?.some(part => {
+          const questionMatch = part.question?.toLowerCase().includes(lowerQuery);
+          const answerMatch = part.answer?.toLowerCase().includes(lowerQuery);
+          return questionMatch || answerMatch;
+        });
+      });
+    }
 
     // Filter by year
     filtered = filtered.filter(bonus => {
@@ -93,6 +111,47 @@ export default function FlashcardGame({ category, onBack, onCategoryChange }: Fl
   const handleFilterChange = (newFilters: FilterOptions) => {
     setFilters(newFilters);
     applyFilters(allBonuses, newFilters);
+  };
+
+  const handleSearch = async (query: string, useSemanticMode: boolean) => {
+    setSearchQuery(query);
+    setLoading(true);
+
+    try {
+      // Call semantic search API
+      const response = await fetch('/api/search', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          query,
+          category,
+          useSemanticMode,
+        }),
+      });
+
+      const data = await response.json();
+
+      if (data.bonuses && data.bonuses.length > 0) {
+        // Store search results and apply current filters
+        setAllBonuses(data.bonuses);
+        applyFilters(data.bonuses, filters, '');
+      } else {
+        setBonuses([]);
+        setCurrentIndex(0);
+      }
+    } catch (error) {
+      console.error('Search error:', error);
+      // Fall back to local filtering
+      applyFilters(allBonuses, filters, query);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchQuery('');
+    // Reload bonuses to reset search
+    loadBonuses();
   };
 
   const handleNext = () => {
@@ -158,6 +217,9 @@ export default function FlashcardGame({ category, onBack, onCategoryChange }: Fl
     <div className="space-y-6">
       {/* Filters */}
       <BonusFilters onFilterChange={handleFilterChange} />
+
+      {/* Search Bar */}
+      <SearchBar onSearch={handleSearch} onClear={handleClearSearch} />
 
       {/* Category tabs at top */}
       {categories.length > 0 && (
