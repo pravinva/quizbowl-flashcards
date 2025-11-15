@@ -33,6 +33,7 @@ export default function Home() {
             <FlashcardGame
               category={selectedCategory}
               onBack={() => setSelectedCategory(null)}
+              onCategoryChange={setSelectedCategory}
             />
           )}
         </div>

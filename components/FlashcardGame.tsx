@@ -2,23 +2,43 @@
 
 import { useEffect, useState } from 'react';
 import Flashcard from './Flashcard';
-import type { Bonus } from '@/types/quizbowl';
+import type { Bonus, CategoryInfo } from '@/types/quizbowl';
 
 interface FlashcardGameProps {
   category: string;
   onBack: () => void;
+  onCategoryChange?: (category: string) => void;
 }
 
-export default function FlashcardGame({ category, onBack }: FlashcardGameProps) {
+export default function FlashcardGame({ category, onBack, onCategoryChange }: FlashcardGameProps) {
   const [bonuses, setBonuses] = useState<Bonus[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
+  const [categories, setCategories] = useState<CategoryInfo[]>([]);
+
+  useEffect(() => {
+    loadCategories();
+  }, []);
 
   useEffect(() => {
     loadBonuses();
+    setCurrentIndex(0); // Reset to first bonus when category changes
   }, [category]);
 
+  const loadCategories = async () => {
+    try {
+      const response = await fetch('/api/categories');
+      const data = await response.json();
+      if (data.categories && data.categories.length > 0) {
+        setCategories(data.categories.filter((c: CategoryInfo) => c.count > 0));
+      }
+    } catch (error) {
+      console.error('Error loading categories:', error);
+    }
+  };
+
   const loadBonuses = async () => {
+    setLoading(true);
     try {
       const response = await fetch(`/api/bonuses/${category}?random=true&limit=50`);
       const data = await response.json();
@@ -80,15 +100,44 @@ export default function FlashcardGame({ category, onBack }: FlashcardGameProps) 
 
   const currentBonus = bonuses[currentIndex];
 
+  const categoryEmojis: Record<string, string> = {
+    literature: '📚',
+    history: '🏛️',
+    science: '🔬',
+    'fine-arts': '🎨',
+  };
+
   return (
-    <div className="space-y-8">
+    <div className="space-y-6">
+      {/* Category tabs at top */}
+      {categories.length > 0 && (
+        <div className="backdrop-blur-sm bg-white/50 dark:bg-gray-800/50 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 shadow-lg">
+          <div className="flex flex-wrap gap-2 justify-center">
+            {categories.map((cat) => (
+              <button
+                key={cat.id}
+                onClick={() => onCategoryChange?.(cat.id)}
+                className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 transform hover:scale-105 ${
+                  cat.id === category
+                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg scale-105'
+                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400'
+                }`}
+              >
+                <span className="mr-1.5">{categoryEmojis[cat.id] || '📖'}</span>
+                {cat.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
       {/* Header with back button and progress */}
       <div className="flex justify-between items-center backdrop-blur-sm bg-white/50 dark:bg-gray-800/50 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 shadow-lg">
         <button
           onClick={onBack}
           className="px-5 py-2.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl font-semibold border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-lg transition-all duration-300 transform hover:scale-105"
         >
-          ← Categories
+          ← Home
         </button>
         <div className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold shadow-lg">
           Question {currentIndex + 1} of {bonuses.length}
