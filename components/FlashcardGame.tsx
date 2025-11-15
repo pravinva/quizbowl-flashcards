@@ -152,7 +152,7 @@ export default function FlashcardGame({ category, onBack, onCategoryChange }: Fl
         </div>
       </div>
 
-      <Flashcard bonus={currentBonus} />
+      <Flashcard key={currentBonus._id} bonus={currentBonus} />
 
       {/* Navigation buttons */}
       <div className="flex justify-between items-center gap-4">
