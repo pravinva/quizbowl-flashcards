@@ -1,19 +1,55 @@
 {
   "totalCategories": 12,
   "categories": [
-    { "category": "Literature", "count": 2 },
-    { "category": "History", "count": 1 },
-    { "category": "Science", "count": 1 },
-    { "category": "Fine Arts", "count": 1 },
-    { "category": "Religion", "count": 0 },
-    { "category": "Mythology", "count": 0 },
-    { "category": "Philosophy", "count": 0 },
-    { "category": "Social Science", "count": 0 },
-    { "category": "Current Events", "count": 0 },
-    { "category": "Geography", "count": 0 },
-    { "category": "Other Academic", "count": 0 },
-    { "category": "Trash", "count": 0 }
+    {
+      "category": "Literature",
+      "count": 1000
+    },
+    {
+      "category": "History",
+      "count": 1000
+    },
+    {
+      "category": "Science",
+      "count": 1000
+    },
+    {
+      "category": "Fine Arts",
+      "count": 1000
+    },
+    {
+      "category": "Religion",
+      "count": 1000
+    },
+    {
+      "category": "Mythology",
+      "count": 1000
+    },
+    {
+      "category": "Philosophy",
+      "count": 1000
+    },
+    {
+      "category": "Social Science",
+      "count": 1000
+    },
+    {
+      "category": "Current Events",
+      "count": 1000
+    },
+    {
+      "category": "Geography",
+      "count": 1000
+    },
+    {
+      "category": "Other Academic",
+      "count": 1000
+    },
+    {
+      "category": "Pop Culture",
+      "count": 1000
+    }
   ],
-  "totalBonuses": 5,
-  "fetchedAt": "2025-11-15T11:45:00.000Z"
+  "totalBonuses": 12000,
+  "fetchedAt": "2025-11-15T14:23:16.146Z"
 }
