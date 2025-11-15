@@ -1,0 +1,64 @@
+[
+  {
+    "_id": "sample-lit-1",
+    "leadin": "This author's works often explore themes of isolation and identity.",
+    "parts": [
+      {
+        "question": "In one novel by this author, Holden Caulfield narrates his experiences in New York City after being expelled from Pencey Prep. For 10 points, name this author of The Catcher in the Rye.",
+        "answer": "J.D. Salinger",
+        "value": 10
+      },
+      {
+        "question": "This author also wrote a series of stories about the Glass family, including one in which Seymour commits suicide while on vacation. For 10 points, name this story.",
+        "answer": "A Perfect Day for Bananafish",
+        "value": 10
+      },
+      {
+        "question": "Another work by this author features Buddy Glass reminiscing about his brother. For 10 points, name this novella.",
+        "answer": "Seymour: An Introduction",
+        "value": 10
+      }
+    ],
+    "category": "Literature",
+    "subcategory": "American Literature",
+    "set": {
+      "year": 2023,
+      "name": "Sample Tournament"
+    },
+    "packet": {
+      "number": 1,
+      "name": "Packet 1"
+    }
+  },
+  {
+    "_id": "sample-lit-2",
+    "leadin": "Answer the following about British Romantic poetry.",
+    "parts": [
+      {
+        "question": "This poet wrote 'I wandered lonely as a cloud' in a poem about daffodils. For 10 points, name this Lake Poet.",
+        "answer": "William Wordsworth",
+        "value": 10
+      },
+      {
+        "question": "Wordsworth collaborated with this poet on Lyrical Ballads, which included 'The Rime of the Ancient Mariner.' For 10 points, name this poet.",
+        "answer": "Samuel Taylor Coleridge",
+        "value": 10
+      },
+      {
+        "question": "This shorter-lived Romantic poet wrote 'Ode to a Nightingale' and 'Ode on a Grecian Urn.' For 10 points, name this poet.",
+        "answer": "John Keats",
+        "value": 10
+      }
+    ],
+    "category": "Literature",
+    "subcategory": "British Literature",
+    "set": {
+      "year": 2023,
+      "name": "Sample Tournament"
+    },
+    "packet": {
+      "number": 1,
+      "name": "Packet 1"
+    }
+  }
+]

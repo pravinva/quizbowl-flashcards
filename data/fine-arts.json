@@ -1,0 +1,33 @@
+[
+  {
+    "_id": "sample-fa-1",
+    "leadin": "Answer the following about Impressionist painters.",
+    "parts": [
+      {
+        "question": "This French artist painted numerous water lilies scenes at his garden in Giverny. For 10 points, name this painter.",
+        "answer": "Claude Monet",
+        "value": 10
+      },
+      {
+        "question": "This artist painted 'A Sunday Afternoon on the Island of La Grande Jatte' using pointillism. For 10 points, name this artist.",
+        "answer": "Georges Seurat",
+        "value": 10
+      },
+      {
+        "question": "This Dutch post-Impressionist painted 'Starry Night' and cut off part of his ear. For 10 points, name this artist.",
+        "answer": "Vincent van Gogh",
+        "value": 10
+      }
+    ],
+    "category": "Fine Arts",
+    "subcategory": "Painting",
+    "set": {
+      "year": 2023,
+      "name": "Sample Tournament"
+    },
+    "packet": {
+      "number": 1,
+      "name": "Packet 1"
+    }
+  }
+]

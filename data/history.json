@@ -1,0 +1,33 @@
+[
+  {
+    "_id": "sample-hist-1",
+    "leadin": "Answer the following about the American Revolution.",
+    "parts": [
+      {
+        "question": "This 1775 battle near Boston saw the famous order 'Don't fire until you see the whites of their eyes.' For 10 points, name this battle.",
+        "answer": "Battle of Bunker Hill (accept Breed's Hill)",
+        "value": 10
+      },
+      {
+        "question": "This Prussian general trained Continental Army troops at Valley Forge during the winter of 1777-78. For 10 points, name this general.",
+        "answer": "Baron von Steuben (Friedrich Wilhelm von Steuben)",
+        "value": 10
+      },
+      {
+        "question": "This 1781 battle effectively ended the Revolutionary War when Cornwallis surrendered to Washington. For 10 points, name this battle.",
+        "answer": "Battle of Yorktown (accept Siege of Yorktown)",
+        "value": 10
+      }
+    ],
+    "category": "History",
+    "subcategory": "American History",
+    "set": {
+      "year": 2023,
+      "name": "Sample Tournament"
+    },
+    "packet": {
+      "number": 1,
+      "name": "Packet 1"
+    }
+  }
+]

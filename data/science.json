@@ -1,0 +1,33 @@
+[
+  {
+    "_id": "sample-sci-1",
+    "leadin": "Answer the following about physics concepts.",
+    "parts": [
+      {
+        "question": "This law states that force equals mass times acceleration. For 10 points, name this law, the second of three laws by an English scientist.",
+        "answer": "Newton's Second Law of Motion",
+        "value": 10
+      },
+      {
+        "question": "This equation, E equals mc squared, relates energy to mass and the speed of light. For 10 points, name this scientist who developed this equation.",
+        "answer": "Albert Einstein",
+        "value": 10
+      },
+      {
+        "question": "This principle states that you cannot simultaneously know both the position and momentum of a particle. For 10 points, name this uncertainty principle.",
+        "answer": "Heisenberg Uncertainty Principle",
+        "value": 10
+      }
+    ],
+    "category": "Science",
+    "subcategory": "Physics",
+    "set": {
+      "year": 2023,
+      "name": "Sample Tournament"
+    },
+    "packet": {
+      "number": 1,
+      "name": "Packet 1"
+    }
+  }
+]

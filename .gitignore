@@ -39,8 +39,8 @@ Thumbs.db
 # TypeScript
 *.tsbuildinfo
 
-# Data
-data/
+# Data (uncomment to exclude data directory from git)
+# data/
 
 # Firebase
 .firebase/
