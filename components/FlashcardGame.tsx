@@ -10,9 +10,10 @@ interface FlashcardGameProps {
   category: string;
   onBack: () => void;
   onCategoryChange?: (category: string) => void;
+  initialSearch?: { query: string; useSemanticMode: boolean } | null;
 }
 
-export default function FlashcardGame({ category, onBack, onCategoryChange }: FlashcardGameProps) {
+export default function FlashcardGame({ category, onBack, onCategoryChange, initialSearch }: FlashcardGameProps) {
   const [bonuses, setBonuses] = useState<Bonus[]>([]);
   const [allBonuses, setAllBonuses] = useState<Bonus[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -30,7 +31,12 @@ export default function FlashcardGame({ category, onBack, onCategoryChange }: Fl
   }, []);
 
   useEffect(() => {
-    loadBonuses();
+    // If there's an initial search, trigger it; otherwise load bonuses normally
+    if (initialSearch) {
+      handleSearch(initialSearch.query, initialSearch.useSemanticMode);
+    } else {
+      loadBonuses();
+    }
     setCurrentIndex(0); // Reset to first bonus when category changes
   }, [category]);
 
@@ -214,7 +220,7 @@ export default function FlashcardGame({ category, onBack, onCategoryChange }: Fl
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8">
       {/* Filters */}
       <BonusFilters onFilterChange={handleFilterChange} />
 
@@ -223,36 +229,34 @@ export default function FlashcardGame({ category, onBack, onCategoryChange }: Fl
 
       {/* Category tabs at top */}
       {categories.length > 0 && (
-        <div className="backdrop-blur-sm bg-white/50 dark:bg-gray-800/50 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 shadow-lg">
-          <div className="flex flex-wrap gap-2 justify-center">
-            {categories.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => onCategoryChange?.(cat.id)}
-                className={`px-4 py-2 rounded-xl font-semibold text-sm transition-all duration-300 transform hover:scale-105 ${
-                  cat.id === category
-                    ? 'bg-gradient-to-r from-blue-600 to-purple-600 text-white shadow-lg scale-105'
-                    : 'bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400'
-                }`}
-              >
-                <span className="mr-1.5">{categoryEmojis[cat.id] || '📖'}</span>
-                {cat.name}
-              </button>
-            ))}
-          </div>
+        <div className="flex flex-wrap gap-3 justify-center">
+          {categories.map((cat) => (
+            <button
+              key={cat.id}
+              onClick={() => onCategoryChange?.(cat.id)}
+              className={`px-5 py-2.5 rounded-full font-semibold text-sm transition-all duration-200 ${
+                cat.id === category
+                  ? 'bg-blue-600 text-white shadow-md'
+                  : 'bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-700 shadow-sm hover:shadow-md'
+              }`}
+            >
+              <span className="mr-1.5">{categoryEmojis[cat.id] || '📖'}</span>
+              {cat.name}
+            </button>
+          ))}
         </div>
       )}
 
       {/* Header with back button and progress */}
-      <div className="flex justify-between items-center backdrop-blur-sm bg-white/50 dark:bg-gray-800/50 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 shadow-lg">
+      <div className="flex justify-between items-center">
         <button
           onClick={onBack}
-          className="px-5 py-2.5 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-xl font-semibold border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-lg transition-all duration-300 transform hover:scale-105"
+          className="px-5 py-2.5 bg-white text-gray-700 rounded-full font-semibold hover:bg-gray-100 shadow-sm hover:shadow-md transition-all duration-200"
         >
           ← Home
         </button>
-        <div className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-xl font-bold shadow-lg">
-          Question {currentIndex + 1} of {bonuses.length}
+        <div className="px-5 py-2.5 bg-blue-600 text-white rounded-full font-semibold shadow-md">
+          {currentIndex + 1} / {bonuses.length}
         </div>
       </div>
 
@@ -263,16 +267,16 @@ export default function FlashcardGame({ category, onBack, onCategoryChange }: Fl
         <button
           onClick={handlePrevious}
           disabled={currentIndex === 0}
-          className="flex-1 px-8 py-4 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 rounded-2xl font-bold border-2 border-gray-300 dark:border-gray-600 hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-xl disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-gray-300 dark:disabled:hover:border-gray-600 transition-all duration-300 transform hover:scale-105"
+          className="flex-1 px-8 py-4 bg-white text-gray-700 rounded-xl font-semibold hover:bg-gray-100 shadow-sm hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition-all duration-200"
         >
-          ⬅️ Previous Bonus
+          ⬅️ Previous
         </button>
         <button
           onClick={handleNext}
           disabled={currentIndex === bonuses.length - 1}
-          className="flex-1 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-2xl font-bold hover:from-blue-700 hover:to-purple-700 hover:shadow-xl disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:from-blue-600 disabled:hover:to-purple-600 transition-all duration-300 transform hover:scale-105 shadow-lg"
+          className="flex-1 px-8 py-4 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-blue-600 transition-all duration-200"
         >
-          Next Bonus ➡️
+          Next ➡️
         </button>
       </div>
     </div>

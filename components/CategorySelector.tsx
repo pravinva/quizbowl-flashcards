@@ -1,10 +1,12 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import SearchBar from './SearchBar';
 import type { CategoryInfo } from '@/types/quizbowl';
 
 interface CategorySelectorProps {
   onSelectCategory: (category: string) => void;
+  onSearch?: (query: string, useSemanticMode: boolean, category: string) => void;
 }
 
 // This will be replaced with actual data from Firebase/API
@@ -24,6 +26,7 @@ const MOCK_CATEGORIES: CategoryInfo[] = [
 
 export default function CategorySelector({
   onSelectCategory,
+  onSearch,
 }: CategorySelectorProps) {
   const [categories, setCategories] = useState<CategoryInfo[]>([]);
   const [loading, setLoading] = useState(true);
@@ -93,6 +96,18 @@ export default function CategorySelector({
     'pop-culture': { bg: '#f97316', text: '#ffffff' },
   };
 
+  const handleSearch = (query: string, useSemanticMode: boolean) => {
+    // Pass search to parent with a default category (or 'all')
+    if (onSearch) {
+      // Search across all categories by using the first category or 'all'
+      onSearch(query, useSemanticMode, categories[0]?.id || 'literature');
+    }
+  };
+
+  const handleClearSearch = () => {
+    // Just a placeholder - parent will handle navigation
+  };
+
   return (
     <div className="space-y-8">
       <div className="text-center p-6 rounded-3xl shadow-xl" style={{ backgroundColor: '#2563eb' }}>
@@ -102,6 +117,15 @@ export default function CategorySelector({
         <p className="text-lg mt-2" style={{ color: '#bfdbfe' }}>
           Select a category to start practicing
         </p>
+      </div>
+
+      {/* Search Bar */}
+      <div className="max-w-3xl mx-auto">
+        <SearchBar
+          onSearch={handleSearch}
+          onClear={handleClearSearch}
+          placeholder='Search all bonuses... e.g., "baroque musicians from France"'
+        />
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
