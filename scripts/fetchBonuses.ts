@@ -20,7 +20,7 @@ const CATEGORIES = [
   'Current Events',
   'Geography',
   'Other Academic',
-  'Trash',
+  'Pop Culture',
 ];
 
 interface FetchOptions {
