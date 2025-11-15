@@ -12,6 +12,7 @@ export interface Bonus {
   category: string;
   subcategory: string;
   alternateSubcategory?: string;
+  difficulty?: number;
   set: {
     year: number;
     name: string;

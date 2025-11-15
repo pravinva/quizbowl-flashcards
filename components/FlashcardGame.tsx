@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import Flashcard from './Flashcard';
+import BonusFilters, { type FilterOptions } from './BonusFilters';
 import type { Bonus, CategoryInfo } from '@/types/quizbowl';
 
 interface FlashcardGameProps {
@@ -12,9 +13,15 @@ interface FlashcardGameProps {
 
 export default function FlashcardGame({ category, onBack, onCategoryChange }: FlashcardGameProps) {
   const [bonuses, setBonuses] = useState<Bonus[]>([]);
+  const [allBonuses, setAllBonuses] = useState<Bonus[]>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [loading, setLoading] = useState(true);
   const [categories, setCategories] = useState<CategoryInfo[]>([]);
+  const [filters, setFilters] = useState<FilterOptions>({
+    minYear: 2010,
+    maxYear: new Date().getFullYear(),
+    difficultyLevel: 'all',
+  });
 
   useEffect(() => {
     loadCategories();
@@ -40,20 +47,52 @@ export default function FlashcardGame({ category, onBack, onCategoryChange }: Fl
   const loadBonuses = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/bonuses/${category}?random=true&limit=50`);
+      const response = await fetch(`/api/bonuses/${category}?random=true&limit=200`);
       const data = await response.json();
 
       if (data.bonuses && data.bonuses.length > 0) {
-        setBonuses(data.bonuses);
+        setAllBonuses(data.bonuses);
+        applyFilters(data.bonuses, filters);
       } else {
+        setAllBonuses([]);
         setBonuses([]);
       }
     } catch (error) {
       console.error('Error loading bonuses:', error);
+      setAllBonuses([]);
       setBonuses([]);
     } finally {
       setLoading(false);
     }
+  };
+
+  const applyFilters = (bonusesToFilter: Bonus[], filterOptions: FilterOptions) => {
+    let filtered = bonusesToFilter;
+
+    // Filter by year
+    filtered = filtered.filter(bonus => {
+      const year = bonus.set?.year || 0;
+      return year >= filterOptions.minYear && year <= filterOptions.maxYear;
+    });
+
+    // Filter by difficulty level
+    if (filterOptions.difficultyLevel !== 'all') {
+      filtered = filtered.filter(bonus => {
+        const diff = bonus.difficulty || 5;
+        if (filterOptions.difficultyLevel === 'easy') return diff >= 1 && diff <= 4;
+        if (filterOptions.difficultyLevel === 'medium') return diff >= 5 && diff <= 7;
+        if (filterOptions.difficultyLevel === 'hard') return diff >= 8 && diff <= 10;
+        return true;
+      });
+    }
+
+    setBonuses(filtered);
+    setCurrentIndex(0);
+  };
+
+  const handleFilterChange = (newFilters: FilterOptions) => {
+    setFilters(newFilters);
+    applyFilters(allBonuses, newFilters);
   };
 
   const handleNext = () => {
@@ -117,6 +156,9 @@ export default function FlashcardGame({ category, onBack, onCategoryChange }: Fl
 
   return (
     <div className="space-y-6">
+      {/* Filters */}
+      <BonusFilters onFilterChange={handleFilterChange} />
+
       {/* Category tabs at top */}
       {categories.length > 0 && (
         <div className="backdrop-blur-sm bg-white/50 dark:bg-gray-800/50 rounded-2xl p-4 border border-gray-200 dark:border-gray-700 shadow-lg">
