@@ -28,114 +28,167 @@ export default function Flashcard({ bonus }: FlashcardProps) {
     setRevealedParts(new Set());
   };
 
-  const partColors = [
-    {
-      question: 'from-blue-400 to-blue-600',
-      answer: 'from-green-400 to-green-600',
-      questionBg: 'bg-blue-50 dark:bg-blue-900/20',
-      answerBg: 'bg-green-50 dark:bg-green-900/20',
-    },
-    {
-      question: 'from-purple-400 to-purple-600',
-      answer: 'from-emerald-400 to-emerald-600',
-      questionBg: 'bg-purple-50 dark:bg-purple-900/20',
-      answerBg: 'bg-emerald-50 dark:bg-emerald-900/20',
-    },
-    {
-      question: 'from-pink-400 to-pink-600',
-      answer: 'from-teal-400 to-teal-600',
-      questionBg: 'bg-pink-50 dark:bg-pink-900/20',
-      answerBg: 'bg-teal-50 dark:bg-teal-900/20',
-    },
-  ];
-
   return (
-    <div className="space-y-4">
+    <div className="space-y-6">
       {/* Bonus metadata */}
-      <div className="flex flex-wrap gap-3 justify-between items-center">
+      <div className="flex flex-wrap gap-4 justify-between items-center">
         <div className="flex gap-3">
-          <div className="px-4 py-2 bg-gradient-to-r from-blue-500 to-purple-600 rounded-full text-white text-sm font-semibold shadow-lg">
+          <div className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl text-white text-sm font-bold shadow-xl">
             {bonus.category}
             {bonus.subcategory && ` • ${bonus.subcategory}`}
           </div>
-          <div className="px-4 py-2 bg-white dark:bg-gray-800 rounded-full text-gray-700 dark:text-gray-300 text-sm font-medium border-2 border-gray-200 dark:border-gray-700 shadow-md">
+          <div className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-pink-600 rounded-xl text-white text-sm font-bold shadow-xl">
             📅 {bonus.set.name} ({bonus.set.year})
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-3">
           <button
             onClick={revealAll}
-            className="px-4 py-2 bg-gradient-to-r from-green-500 to-emerald-600 text-white text-xs font-bold rounded-lg hover:from-green-600 hover:to-emerald-700 shadow-md transition-all"
+            className="px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white text-sm font-bold rounded-xl hover:from-green-700 hover:to-emerald-700 shadow-xl transition-all transform hover:scale-105"
           >
-            Show All
+            Show All Answers
           </button>
           <button
             onClick={hideAll}
-            className="px-4 py-2 bg-gradient-to-r from-gray-500 to-gray-600 text-white text-xs font-bold rounded-lg hover:from-gray-600 hover:to-gray-700 shadow-md transition-all"
+            className="px-5 py-2.5 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-sm font-bold rounded-xl hover:from-gray-700 hover:to-gray-800 shadow-xl transition-all transform hover:scale-105"
           >
             Hide All
           </button>
         </div>
       </div>
 
-      {/* Lead-in */}
+      {/* Lead-in - BLUE */}
       {bonus.leadin && (
-        <div className="relative p-6 bg-gradient-to-br from-indigo-50 to-purple-50 dark:from-indigo-900/30 dark:to-purple-900/30 rounded-2xl border-2 border-indigo-300 dark:border-indigo-700 shadow-lg">
-          <div className="absolute -top-3 left-6 px-3 py-1 bg-gradient-to-r from-indigo-600 to-purple-600 rounded-full text-white text-xs font-bold shadow-md">
-            💡 Lead-in
+        <div className="p-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl shadow-2xl transform hover:scale-[1.01] transition-all">
+          <div className="flex items-center gap-2 mb-4">
+            <span className="text-2xl">💡</span>
+            <h3 className="text-white text-xl font-bold">Lead-in</h3>
           </div>
-          <p className="text-gray-800 dark:text-gray-200 mt-2 leading-relaxed font-medium">
+          <p className="text-white text-lg leading-relaxed font-medium">
             {bonus.leadin}
           </p>
         </div>
       )}
 
-      {/* Parts - stacked vertically */}
-      {bonus.parts.map((part, index) => {
-        const isRevealed = revealedParts.has(index);
-        const colors = partColors[index % partColors.length];
-
-        return (
-          <div key={index} className="space-y-3">
-            {/* Question Box */}
-            <div className={`relative p-6 ${colors.questionBg} rounded-2xl border-2 border-blue-300 dark:border-blue-700 shadow-lg`}>
-              <div className={`absolute -top-3 left-6 px-3 py-1 bg-gradient-to-r ${colors.question} rounded-full text-white text-xs font-bold shadow-md`}>
-                ❓ Part {index + 1} • {part.value} pts
-              </div>
-              <p className="text-gray-800 dark:text-gray-200 mt-2 leading-relaxed text-lg font-medium">
-                {part.question}
-              </p>
+      {/* Part 1 - LIGHT BLUE question, BLUE answer */}
+      {bonus.parts[0] && (
+        <div className="space-y-4">
+          {/* Question - Light Blue */}
+          <div className="p-8 bg-gradient-to-br from-blue-200 to-blue-300 rounded-3xl shadow-2xl transform hover:scale-[1.01] transition-all">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-2xl">❓</span>
+              <h3 className="text-blue-900 text-xl font-bold">Part 1 • {bonus.parts[0].value} points</h3>
             </div>
-
-            {/* Answer Box - Toggle */}
-            <button
-              onClick={() => toggleReveal(index)}
-              className="w-full text-left"
-            >
-              <div className={`relative p-6 ${colors.answerBg} rounded-2xl border-2 ${
-                isRevealed ? 'border-green-400 dark:border-green-600' : 'border-green-300 dark:border-green-700'
-              } shadow-lg hover:shadow-xl transition-all duration-300 cursor-pointer ${
-                isRevealed ? 'transform scale-[1.02]' : ''
-              }`}>
-                <div className={`absolute -top-3 left-6 px-3 py-1 bg-gradient-to-r ${colors.answer} rounded-full text-white text-xs font-bold shadow-md`}>
-                  ✅ Answer {index + 1}
-                </div>
-                <div className="mt-2">
-                  {isRevealed ? (
-                    <p className="text-gray-900 dark:text-white text-xl font-bold leading-relaxed">
-                      {part.answer}
-                    </p>
-                  ) : (
-                    <p className="text-gray-500 dark:text-gray-400 text-center font-medium animate-pulse">
-                      👆 Click to reveal answer
-                    </p>
-                  )}
-                </div>
-              </div>
-            </button>
+            <p className="text-blue-900 text-lg leading-relaxed font-semibold">
+              {bonus.parts[0].question}
+            </p>
           </div>
-        );
-      })}
+
+          {/* Answer - Blue */}
+          <button
+            onClick={() => toggleReveal(0)}
+            className="w-full text-left"
+          >
+            <div className={`p-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl shadow-2xl transition-all transform ${
+              revealedParts.has(0) ? 'scale-[1.02] shadow-blue-500/50' : 'hover:scale-[1.01]'
+            }`}>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-2xl">✅</span>
+                <h3 className="text-white text-xl font-bold">Answer 1</h3>
+              </div>
+              {revealedParts.has(0) ? (
+                <p className="text-white text-2xl font-bold leading-relaxed">
+                  {bonus.parts[0].answer}
+                </p>
+              ) : (
+                <p className="text-blue-200 text-center text-lg font-semibold animate-pulse">
+                  👆 Click to reveal answer
+                </p>
+              )}
+            </div>
+          </button>
+        </div>
+      )}
+
+      {/* Part 2 - LIGHT GREEN question, BLUE answer */}
+      {bonus.parts[1] && (
+        <div className="space-y-4">
+          {/* Question - Light Green */}
+          <div className="p-8 bg-gradient-to-br from-green-200 to-green-300 rounded-3xl shadow-2xl transform hover:scale-[1.01] transition-all">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-2xl">❓</span>
+              <h3 className="text-green-900 text-xl font-bold">Part 2 • {bonus.parts[1].value} points</h3>
+            </div>
+            <p className="text-green-900 text-lg leading-relaxed font-semibold">
+              {bonus.parts[1].question}
+            </p>
+          </div>
+
+          {/* Answer - Blue */}
+          <button
+            onClick={() => toggleReveal(1)}
+            className="w-full text-left"
+          >
+            <div className={`p-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl shadow-2xl transition-all transform ${
+              revealedParts.has(1) ? 'scale-[1.02] shadow-blue-500/50' : 'hover:scale-[1.01]'
+            }`}>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-2xl">✅</span>
+                <h3 className="text-white text-xl font-bold">Answer 2</h3>
+              </div>
+              {revealedParts.has(1) ? (
+                <p className="text-white text-2xl font-bold leading-relaxed">
+                  {bonus.parts[1].answer}
+                </p>
+              ) : (
+                <p className="text-blue-200 text-center text-lg font-semibold animate-pulse">
+                  👆 Click to reveal answer
+                </p>
+              )}
+            </div>
+          </button>
+        </div>
+      )}
+
+      {/* Part 3 - LIGHT RED/PINK question, BLUE answer */}
+      {bonus.parts[2] && (
+        <div className="space-y-4">
+          {/* Question - Light Red/Pink */}
+          <div className="p-8 bg-gradient-to-br from-red-200 to-red-300 rounded-3xl shadow-2xl transform hover:scale-[1.01] transition-all">
+            <div className="flex items-center gap-2 mb-4">
+              <span className="text-2xl">❓</span>
+              <h3 className="text-red-900 text-xl font-bold">Part 3 • {bonus.parts[2].value} points</h3>
+            </div>
+            <p className="text-red-900 text-lg leading-relaxed font-semibold">
+              {bonus.parts[2].question}
+            </p>
+          </div>
+
+          {/* Answer - Blue */}
+          <button
+            onClick={() => toggleReveal(2)}
+            className="w-full text-left"
+          >
+            <div className={`p-8 bg-gradient-to-br from-blue-600 to-blue-700 rounded-3xl shadow-2xl transition-all transform ${
+              revealedParts.has(2) ? 'scale-[1.02] shadow-blue-500/50' : 'hover:scale-[1.01]'
+            }`}>
+              <div className="flex items-center gap-2 mb-4">
+                <span className="text-2xl">✅</span>
+                <h3 className="text-white text-xl font-bold">Answer 3</h3>
+              </div>
+              {revealedParts.has(2) ? (
+                <p className="text-white text-2xl font-bold leading-relaxed">
+                  {bonus.parts[2].answer}
+                </p>
+              ) : (
+                <p className="text-blue-200 text-center text-lg font-semibold animate-pulse">
+                  👆 Click to reveal answer
+                </p>
+              )}
+            </div>
+          </button>
+        </div>
+      )}
     </div>
   );
 }
