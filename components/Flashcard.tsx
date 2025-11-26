@@ -46,28 +46,28 @@ export default function Flashcard({ bonus }: FlashcardProps) {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       {/* Bonus metadata */}
-      <div className="flex flex-wrap gap-4 justify-between items-center">
-        <div className="flex gap-3">
-          <div className="px-5 py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl text-white text-sm font-bold shadow-xl">
+      <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-between items-start sm:items-center">
+        <div className="flex flex-wrap gap-2 sm:gap-3">
+          <div className="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl text-white text-xs sm:text-sm font-bold shadow-xl">
             {bonus.category}
             {bonus.subcategory && ` • ${bonus.subcategory}`}
           </div>
-          <div className="px-5 py-2.5 bg-gradient-to-r from-orange-500 to-pink-600 rounded-xl text-white text-sm font-bold shadow-xl">
+          <div className="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-gradient-to-r from-orange-500 to-pink-600 rounded-xl text-white text-xs sm:text-sm font-bold shadow-xl">
             📅 {bonus.set.name} ({bonus.set.year})
           </div>
         </div>
-        <div className="flex gap-3">
+        <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
           <button
             onClick={revealAll}
-            className="px-5 py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white text-sm font-bold rounded-xl hover:from-green-700 hover:to-emerald-700 shadow-xl transition-all transform hover:scale-105"
+            className="flex-1 sm:flex-none px-3 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white text-xs sm:text-sm font-bold rounded-xl hover:from-green-700 hover:to-emerald-700 shadow-xl transition-all transform hover:scale-105 active:scale-95"
           >
-            Show All Answers
+            Show All
           </button>
           <button
             onClick={hideAll}
-            className="px-5 py-2.5 bg-gradient-to-r from-gray-600 to-gray-700 text-white text-sm font-bold rounded-xl hover:from-gray-700 hover:to-gray-800 shadow-xl transition-all transform hover:scale-105"
+            className="flex-1 sm:flex-none px-3 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs sm:text-sm font-bold rounded-xl hover:from-indigo-700 hover:to-purple-700 shadow-xl transition-all transform hover:scale-105 active:scale-95"
           >
             Hide All
           </button>
@@ -76,13 +76,13 @@ export default function Flashcard({ bonus }: FlashcardProps) {
 
       {/* Lead-in - BLUE */}
       {bonus.leadin && (
-        <div className="p-8 rounded-3xl shadow-2xl transform hover:scale-[1.01] transition-all" style={{ backgroundColor: '#2563eb' }}>
-          <div className="flex items-center gap-2 mb-4">
-            <span className="text-2xl">💡</span>
-            <h3 className="text-xl font-bold" style={{ color: '#ffffff' }}>Lead-in</h3>
+        <div className="p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-2xl transform hover:scale-[1.01] transition-all" style={{ backgroundColor: '#2563eb' }}>
+          <div className="flex items-center gap-2 mb-3 sm:mb-4">
+            <span className="text-xl sm:text-2xl">💡</span>
+            <h3 className="text-lg sm:text-xl font-bold" style={{ color: '#ffffff' }}>Lead-in</h3>
           </div>
           <div
-            className="text-lg leading-relaxed font-medium"
+            className="text-base sm:text-lg md:text-xl leading-relaxed font-medium text-center tracking-wide"
             style={{ color: '#ffffff' }}
             dangerouslySetInnerHTML={{ __html: bonus.leadin }}
           />
@@ -95,23 +95,23 @@ export default function Flashcard({ bonus }: FlashcardProps) {
           {/* Question - Light Blue */}
           <button
             onClick={() => toggleQuestion(0)}
-            className="w-full text-left"
+            className="w-full"
           >
-            <div className={`p-8 rounded-3xl shadow-2xl transition-all transform ${
+            <div className={`p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-2xl transition-all transform flex flex-col items-center justify-center min-h-[180px] sm:min-h-[200px] ${
               revealedQuestions.has(0) ? 'scale-[1.02]' : 'hover:scale-[1.01]'
             }`} style={{ backgroundColor: '#bfdbfe' }}>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-2xl">❓</span>
-                <h3 className="text-xl font-bold" style={{ color: '#1e3a8a' }}>Part 1 • {bonus.parts[0].value} points</h3>
+              <div className="flex items-center gap-2 mb-4 sm:mb-6">
+                <span className="text-xl sm:text-2xl">❓</span>
+                <h3 className="text-base sm:text-lg md:text-xl font-bold" style={{ color: '#1e3a8a' }}>Part 1 • {bonus.parts[0].value} points</h3>
               </div>
               {revealedQuestions.has(0) ? (
                 <div
-                  className="text-lg leading-relaxed font-semibold"
+                  className="text-base sm:text-lg md:text-xl leading-relaxed font-medium text-center tracking-wide px-2"
                   style={{ color: '#1e3a8a' }}
                   dangerouslySetInnerHTML={{ __html: bonus.parts[0].question }}
                 />
               ) : (
-                <p className="text-center text-lg font-semibold animate-pulse" style={{ color: '#1e3a8a' }}>
+                <p className="text-center text-base sm:text-lg md:text-xl font-medium animate-pulse tracking-wide px-2" style={{ color: '#1e3a8a' }}>
                   👆 Click to reveal question
                 </p>
               )}
@@ -122,23 +122,23 @@ export default function Flashcard({ bonus }: FlashcardProps) {
           {revealedQuestions.has(0) && (
             <button
               onClick={() => toggleAnswer(0)}
-              className="w-full text-left"
+              className="w-full"
             >
-              <div className={`p-8 rounded-3xl shadow-2xl transition-all transform ${
+              <div className={`p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-2xl transition-all transform flex flex-col items-center justify-center min-h-[180px] sm:min-h-[200px] ${
                 revealedAnswers.has(0) ? 'scale-[1.02]' : 'hover:scale-[1.01]'
               }`} style={{ backgroundColor: '#2563eb' }}>
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-2xl">✅</span>
-                  <h3 className="text-xl font-bold" style={{ color: '#ffffff' }}>Answer 1</h3>
+                <div className="flex items-center gap-2 mb-4 sm:mb-6">
+                  <span className="text-xl sm:text-2xl">✅</span>
+                  <h3 className="text-base sm:text-lg md:text-xl font-bold" style={{ color: '#ffffff' }}>Answer 1</h3>
                 </div>
                 {revealedAnswers.has(0) ? (
                   <div
-                    className="text-2xl font-bold leading-relaxed"
+                    className="text-lg sm:text-xl md:text-2xl font-semibold leading-relaxed text-center tracking-wide px-2"
                     style={{ color: '#ffffff' }}
                     dangerouslySetInnerHTML={{ __html: bonus.parts[0].answer }}
                   />
                 ) : (
-                  <p className="text-center text-lg font-semibold animate-pulse" style={{ color: '#bfdbfe' }}>
+                  <p className="text-center text-base sm:text-lg md:text-xl font-medium animate-pulse tracking-wide px-2" style={{ color: '#bfdbfe' }}>
                     👆 Click to reveal answer
                   </p>
                 )}
@@ -154,23 +154,23 @@ export default function Flashcard({ bonus }: FlashcardProps) {
           {/* Question - Light Green */}
           <button
             onClick={() => toggleQuestion(1)}
-            className="w-full text-left"
+            className="w-full"
           >
-            <div className={`p-8 rounded-3xl shadow-2xl transition-all transform ${
+            <div className={`p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-2xl transition-all transform flex flex-col items-center justify-center min-h-[180px] sm:min-h-[200px] ${
               revealedQuestions.has(1) ? 'scale-[1.02]' : 'hover:scale-[1.01]'
             }`} style={{ backgroundColor: '#bbf7d0' }}>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-2xl">❓</span>
-                <h3 className="text-xl font-bold" style={{ color: '#14532d' }}>Part 2 • {bonus.parts[1].value} points</h3>
+              <div className="flex items-center gap-2 mb-4 sm:mb-6">
+                <span className="text-xl sm:text-2xl">❓</span>
+                <h3 className="text-base sm:text-lg md:text-xl font-bold" style={{ color: '#14532d' }}>Part 2 • {bonus.parts[1].value} points</h3>
               </div>
               {revealedQuestions.has(1) ? (
                 <div
-                  className="text-lg leading-relaxed font-semibold"
+                  className="text-base sm:text-lg md:text-xl leading-relaxed font-medium text-center tracking-wide px-2"
                   style={{ color: '#14532d' }}
                   dangerouslySetInnerHTML={{ __html: bonus.parts[1].question }}
                 />
               ) : (
-                <p className="text-center text-lg font-semibold animate-pulse" style={{ color: '#14532d' }}>
+                <p className="text-center text-base sm:text-lg md:text-xl font-medium animate-pulse tracking-wide px-2" style={{ color: '#14532d' }}>
                   👆 Click to reveal question
                 </p>
               )}
@@ -181,23 +181,23 @@ export default function Flashcard({ bonus }: FlashcardProps) {
           {revealedQuestions.has(1) && (
             <button
               onClick={() => toggleAnswer(1)}
-              className="w-full text-left"
+              className="w-full"
             >
-              <div className={`p-8 rounded-3xl shadow-2xl transition-all transform ${
+              <div className={`p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-2xl transition-all transform flex flex-col items-center justify-center min-h-[180px] sm:min-h-[200px] ${
                 revealedAnswers.has(1) ? 'scale-[1.02]' : 'hover:scale-[1.01]'
               }`} style={{ backgroundColor: '#2563eb' }}>
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-2xl">✅</span>
-                  <h3 className="text-xl font-bold" style={{ color: '#ffffff' }}>Answer 2</h3>
+                <div className="flex items-center gap-2 mb-4 sm:mb-6">
+                  <span className="text-xl sm:text-2xl">✅</span>
+                  <h3 className="text-base sm:text-lg md:text-xl font-bold" style={{ color: '#ffffff' }}>Answer 2</h3>
                 </div>
                 {revealedAnswers.has(1) ? (
                   <div
-                    className="text-2xl font-bold leading-relaxed"
+                    className="text-lg sm:text-xl md:text-2xl font-semibold leading-relaxed text-center tracking-wide px-2"
                     style={{ color: '#ffffff' }}
                     dangerouslySetInnerHTML={{ __html: bonus.parts[1].answer }}
                   />
                 ) : (
-                  <p className="text-center text-lg font-semibold animate-pulse" style={{ color: '#bfdbfe' }}>
+                  <p className="text-center text-base sm:text-lg md:text-xl font-medium animate-pulse tracking-wide px-2" style={{ color: '#bfdbfe' }}>
                     👆 Click to reveal answer
                   </p>
                 )}
@@ -213,23 +213,23 @@ export default function Flashcard({ bonus }: FlashcardProps) {
           {/* Question - Light Red/Pink */}
           <button
             onClick={() => toggleQuestion(2)}
-            className="w-full text-left"
+            className="w-full"
           >
-            <div className={`p-8 rounded-3xl shadow-2xl transition-all transform ${
+            <div className={`p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-2xl transition-all transform flex flex-col items-center justify-center min-h-[180px] sm:min-h-[200px] ${
               revealedQuestions.has(2) ? 'scale-[1.02]' : 'hover:scale-[1.01]'
             }`} style={{ backgroundColor: '#fecaca' }}>
-              <div className="flex items-center gap-2 mb-4">
-                <span className="text-2xl">❓</span>
-                <h3 className="text-xl font-bold" style={{ color: '#7f1d1d' }}>Part 3 • {bonus.parts[2].value} points</h3>
+              <div className="flex items-center gap-2 mb-4 sm:mb-6">
+                <span className="text-xl sm:text-2xl">❓</span>
+                <h3 className="text-base sm:text-lg md:text-xl font-bold" style={{ color: '#7f1d1d' }}>Part 3 • {bonus.parts[2].value} points</h3>
               </div>
               {revealedQuestions.has(2) ? (
                 <div
-                  className="text-lg leading-relaxed font-semibold"
+                  className="text-base sm:text-lg md:text-xl leading-relaxed font-medium text-center tracking-wide px-2"
                   style={{ color: '#7f1d1d' }}
                   dangerouslySetInnerHTML={{ __html: bonus.parts[2].question }}
                 />
               ) : (
-                <p className="text-center text-lg font-semibold animate-pulse" style={{ color: '#7f1d1d' }}>
+                <p className="text-center text-base sm:text-lg md:text-xl font-medium animate-pulse tracking-wide px-2" style={{ color: '#7f1d1d' }}>
                   👆 Click to reveal question
                 </p>
               )}
@@ -240,23 +240,23 @@ export default function Flashcard({ bonus }: FlashcardProps) {
           {revealedQuestions.has(2) && (
             <button
               onClick={() => toggleAnswer(2)}
-              className="w-full text-left"
+              className="w-full"
             >
-              <div className={`p-8 rounded-3xl shadow-2xl transition-all transform ${
+              <div className={`p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-2xl transition-all transform flex flex-col items-center justify-center min-h-[180px] sm:min-h-[200px] ${
                 revealedAnswers.has(2) ? 'scale-[1.02]' : 'hover:scale-[1.01]'
               }`} style={{ backgroundColor: '#2563eb' }}>
-                <div className="flex items-center gap-2 mb-4">
-                  <span className="text-2xl">✅</span>
-                  <h3 className="text-xl font-bold" style={{ color: '#ffffff' }}>Answer 3</h3>
+                <div className="flex items-center gap-2 mb-4 sm:mb-6">
+                  <span className="text-xl sm:text-2xl">✅</span>
+                  <h3 className="text-base sm:text-lg md:text-xl font-bold" style={{ color: '#ffffff' }}>Answer 3</h3>
                 </div>
                 {revealedAnswers.has(2) ? (
                   <div
-                    className="text-2xl font-bold leading-relaxed"
+                    className="text-lg sm:text-xl md:text-2xl font-semibold leading-relaxed text-center tracking-wide px-2"
                     style={{ color: '#ffffff' }}
                     dangerouslySetInnerHTML={{ __html: bonus.parts[2].answer }}
                   />
                 ) : (
-                  <p className="text-center text-lg font-semibold animate-pulse" style={{ color: '#bfdbfe' }}>
+                  <p className="text-center text-base sm:text-lg md:text-xl font-medium animate-pulse tracking-wide px-2" style={{ color: '#bfdbfe' }}>
                     👆 Click to reveal answer
                   </p>
                 )}

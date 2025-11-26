@@ -52,7 +52,7 @@ export default function SearchBar({ onSearch, onClear, placeholder = 'Ask anythi
       <div className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-3 p-4 sm:p-4 rounded-xl border-2 transition-all ${
         isActive
           ? 'border-purple-500 bg-purple-50'
-          : 'border-gray-200 bg-white hover:border-purple-400'
+          : 'border-blue-200 bg-white hover:border-purple-400'
       }`}>
         <div className="flex items-center gap-3 flex-1">
           <span className="text-2xl sm:text-2xl">🔍</span>
@@ -83,7 +83,7 @@ export default function SearchBar({ onSearch, onClear, placeholder = 'Ask anythi
             className={`px-4 py-2.5 sm:px-3 sm:py-1.5 text-sm sm:text-xs font-bold rounded-lg transition-all ${
               semanticMode
                 ? 'bg-purple-500 text-white'
-                : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
+                : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
             }`}
             title={semanticMode ? 'Using AI semantic search' : 'Using keyword search'}
           >

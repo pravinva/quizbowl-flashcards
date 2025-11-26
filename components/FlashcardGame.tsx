@@ -175,8 +175,8 @@ export default function FlashcardGame({ category, onBack, onCategoryChange, init
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 dark:border-gray-100"></div>
-        <p className="mt-4 text-gray-600 dark:text-gray-400">
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600 border-t-transparent"></div>
+        <p className="mt-4 text-xl font-semibold" style={{ color: '#2563eb' }}>
           Loading bonuses...
         </p>
       </div>
@@ -185,16 +185,16 @@ export default function FlashcardGame({ category, onBack, onCategoryChange, init
 
   if (bonuses.length === 0) {
     return (
-      <div className="text-center py-12">
-        <p className="text-xl text-gray-600 dark:text-gray-400 mb-8">
+      <div className="text-center py-12 px-4">
+        <p className="text-xl font-semibold mb-8" style={{ color: '#2563eb' }}>
           No bonuses available for this category yet.
         </p>
-        <p className="text-gray-500 dark:text-gray-500 mb-8">
-          Run <code className="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded">npm run fetch-data</code> to download bonuses from QBReader.
+        <p className="text-lg mb-8" style={{ color: '#3b82f6' }}>
+          Run <code className="bg-blue-100 px-3 py-1.5 rounded-lg font-mono text-sm" style={{ color: '#1e40af' }}>npm run fetch-data</code> to download bonuses from QBReader.
         </p>
         <button
           onClick={onBack}
-          className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+          className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-md font-semibold"
         >
           Back to Categories
         </button>
@@ -229,21 +229,41 @@ export default function FlashcardGame({ category, onBack, onCategoryChange, init
 
       {/* Category tabs at top */}
       {categories.length > 0 && (
-        <div className="flex flex-wrap gap-3 justify-center">
-          {categories.map((cat) => (
-            <button
-              key={cat.id}
-              onClick={() => onCategoryChange?.(cat.id)}
-              className={`px-5 py-2.5 rounded-full font-semibold text-sm transition-all duration-200 ${
-                cat.id === category
-                  ? 'bg-blue-600 text-white shadow-md'
-                  : 'bg-white text-gray-700 hover:bg-blue-50 hover:text-blue-700 shadow-sm hover:shadow-md'
-              }`}
-            >
-              <span className="mr-1.5">{categoryEmojis[cat.id] || '📖'}</span>
-              {cat.name}
-            </button>
-          ))}
+        <div className="flex flex-wrap gap-2 sm:gap-3 justify-center px-2">
+          {categories.map((cat) => {
+            const isActive = cat.id === category;
+            const categoryGradients: Record<string, string> = {
+              literature: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+              history: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              science: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
+              'fine-arts': 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
+              religion: 'linear-gradient(135deg, #06b6d4 0%, #0891b2 100%)',
+              mythology: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+              philosophy: 'linear-gradient(135deg, #6366f1 0%, #4f46e5 100%)',
+              'social-science': 'linear-gradient(135deg, #14b8a6 0%, #0d9488 100%)',
+              'current-events': 'linear-gradient(135deg, #ef4444 0%, #dc2626 100%)',
+              geography: 'linear-gradient(135deg, #22c55e 0%, #16a34a 100%)',
+              'other-academic': 'linear-gradient(135deg, #a855f7 0%, #9333ea 100%)',
+              'pop-culture': 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
+            };
+            const gradient = categoryGradients[cat.id] || 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)';
+            
+            return (
+              <button
+                key={cat.id}
+                onClick={() => onCategoryChange?.(cat.id)}
+                className={`px-4 py-2 sm:px-5 sm:py-2.5 rounded-full font-semibold text-xs sm:text-sm transition-all duration-200 shadow-md ${
+                  isActive
+                    ? 'text-white scale-105'
+                    : 'text-white hover:scale-105 active:scale-95 opacity-70 hover:opacity-100'
+                }`}
+                style={isActive ? { background: gradient } : { background: gradient, opacity: 0.7 }}
+              >
+                <span className="mr-1.5">{categoryEmojis[cat.id] || '📖'}</span>
+                {cat.name}
+              </button>
+            );
+          })}
         </div>
       )}
 
@@ -251,7 +271,7 @@ export default function FlashcardGame({ category, onBack, onCategoryChange, init
       <div className="flex justify-between items-center">
         <button
           onClick={onBack}
-          className="px-5 py-2.5 bg-white text-gray-700 rounded-full font-semibold hover:bg-gray-100 shadow-sm hover:shadow-md transition-all duration-200"
+          className="px-4 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full font-semibold hover:from-blue-600 hover:to-purple-700 shadow-md hover:shadow-lg transition-all duration-200 active:scale-95"
         >
           ← Home
         </button>
@@ -267,14 +287,14 @@ export default function FlashcardGame({ category, onBack, onCategoryChange, init
         <button
           onClick={handlePrevious}
           disabled={currentIndex === 0}
-          className="flex-1 px-8 py-4 bg-white text-gray-700 rounded-xl font-semibold hover:bg-gray-100 shadow-sm hover:shadow-md disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-white transition-all duration-200"
+          className="flex-1 px-4 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-indigo-500 to-purple-600 text-white rounded-xl font-semibold hover:from-indigo-600 hover:to-purple-700 shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:from-indigo-500 disabled:hover:to-purple-600 transition-all duration-200 active:scale-95"
         >
           ⬅️ Previous
         </button>
         <button
           onClick={handleNext}
           disabled={currentIndex === bonuses.length - 1}
-          className="flex-1 px-8 py-4 bg-blue-600 text-white rounded-xl font-semibold hover:bg-blue-700 shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:bg-blue-600 transition-all duration-200"
+          className="flex-1 px-4 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:from-blue-600 disabled:hover:to-blue-700 transition-all duration-200 active:scale-95"
         >
           Next ➡️
         </button>

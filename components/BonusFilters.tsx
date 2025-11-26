@@ -50,7 +50,7 @@ export default function BonusFilters({ onFilterChange }: BonusFiltersProps) {
   };
 
   return (
-    <div className="backdrop-blur-sm bg-white/50 rounded-2xl border border-gray-200 shadow-lg overflow-hidden">
+    <div className="backdrop-blur-sm bg-white/80 rounded-2xl border-2 border-blue-200 shadow-lg overflow-hidden">
       <button
         onClick={() => setShowFilters(!showFilters)}
         className="w-full flex justify-between items-center px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold hover:from-blue-700 hover:to-purple-700 transition-all"
@@ -107,7 +107,7 @@ export default function BonusFilters({ onFilterChange }: BonusFiltersProps) {
               🎓 Difficulty Level
             </label>
             <div className="space-y-2">
-              <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-gray-200 hover:border-blue-400 cursor-pointer transition-all bg-white">
+              <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-blue-200 hover:border-blue-400 cursor-pointer transition-all bg-white">
                 <input
                   type="radio"
                   name="difficulty"
@@ -193,14 +193,14 @@ export default function BonusFilters({ onFilterChange }: BonusFiltersProps) {
               className={`flex-1 px-6 py-3 rounded-xl font-bold shadow-lg transition-all ${
                 hasUnappliedChanges
                   ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 animate-pulse'
-                  : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+                  : 'bg-blue-200 text-blue-600 cursor-not-allowed'
               }`}
             >
               {hasUnappliedChanges ? '⚠️ Apply Changes' : '✓ Filters Applied'}
             </button>
             <button
               onClick={handleReset}
-              className="px-6 py-3 bg-white text-gray-700 rounded-xl font-bold border-2 border-gray-300 hover:border-red-500 hover:text-red-600 transition-all"
+              className="px-6 py-3 bg-white text-blue-700 rounded-xl font-bold border-2 border-blue-300 hover:border-red-500 hover:text-red-600 transition-all"
             >
               Reset
             </button>
