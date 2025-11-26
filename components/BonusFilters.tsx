@@ -50,10 +50,10 @@ export default function BonusFilters({ onFilterChange }: BonusFiltersProps) {
   };
 
   return (
-    <div className="backdrop-blur-sm bg-white/80 rounded-2xl border-2 border-blue-200 shadow-lg overflow-hidden">
+    <div className="backdrop-blur-sm bg-white/80 rounded-2xl border-2 border-sky-200 shadow-lg overflow-hidden">
       <button
         onClick={() => setShowFilters(!showFilters)}
-        className="w-full flex justify-between items-center px-6 py-4 bg-gradient-to-r from-blue-600 to-purple-600 text-white font-bold hover:from-blue-700 hover:to-purple-700 transition-all"
+        className="w-full flex justify-between items-center px-6 py-4 bg-gradient-to-r from-sky-400 to-purple-400 text-white font-bold hover:from-sky-500 hover:to-purple-500 transition-all"
       >
         <span className="flex items-center gap-2">
           <span className="text-xl">🎯</span>
@@ -72,10 +72,10 @@ export default function BonusFilters({ onFilterChange }: BonusFiltersProps) {
           {/* Year Range */}
           <div className="space-y-3">
             <div className="flex justify-between items-center">
-              <label className="text-base font-bold" style={{ color: '#1e40af', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+              <label className="text-base font-bold" style={{ color: '#0c4a6e', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
                 📅 Year Range
               </label>
-              <span className="text-base font-bold" style={{ color: '#2563eb', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+              <span className="text-base font-bold" style={{ color: '#0284c7', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
                 {pendingMinYear} - {pendingMaxYear}
               </span>
             </div>
@@ -87,7 +87,7 @@ export default function BonusFilters({ onFilterChange }: BonusFiltersProps) {
                 value={pendingMinYear}
                 onChange={(e) => setPendingMinYear(Math.min(Number(e.target.value), pendingMaxYear))}
                 className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
-                style={{ accentColor: '#2563eb' }}
+                style={{ accentColor: '#38bdf8' }}
               />
               <input
                 type="range"
@@ -96,18 +96,18 @@ export default function BonusFilters({ onFilterChange }: BonusFiltersProps) {
                 value={pendingMaxYear}
                 onChange={(e) => setPendingMaxYear(Math.max(Number(e.target.value), pendingMinYear))}
                 className="w-full h-2 bg-blue-200 rounded-lg appearance-none cursor-pointer"
-                style={{ accentColor: '#2563eb' }}
+                style={{ accentColor: '#38bdf8' }}
               />
             </div>
           </div>
 
           {/* Difficulty Level */}
           <div className="space-y-3">
-            <label className="text-base font-bold" style={{ color: '#1e40af', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
+            <label className="text-base font-bold" style={{ color: '#0c4a6e', fontFamily: 'system-ui, -apple-system, sans-serif' }}>
               🎓 Difficulty Level
             </label>
             <div className="space-y-2">
-              <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-blue-200 hover:border-blue-400 cursor-pointer transition-all bg-white">
+              <label className="flex items-center gap-3 p-4 rounded-xl border-2 border-sky-200 hover:border-sky-400 cursor-pointer transition-all bg-white">
                 <input
                   type="radio"
                   name="difficulty"
@@ -115,7 +115,7 @@ export default function BonusFilters({ onFilterChange }: BonusFiltersProps) {
                   checked={pendingDifficulty === 'all'}
                   onChange={() => setPendingDifficulty('all')}
                   className="w-5 h-5"
-                  style={{ accentColor: '#2563eb' }}
+                  style={{ accentColor: '#38bdf8' }}
                 />
                 <div className="flex-1">
                   <div className="font-bold text-base" style={{ color: '#1f2937', fontFamily: 'system-ui, -apple-system, sans-serif' }}>All Levels</div>
@@ -193,14 +193,14 @@ export default function BonusFilters({ onFilterChange }: BonusFiltersProps) {
               className={`flex-1 px-6 py-3 rounded-xl font-bold shadow-lg transition-all ${
                 hasUnappliedChanges
                   ? 'bg-gradient-to-r from-orange-500 to-red-500 text-white hover:from-orange-600 hover:to-red-600 animate-pulse'
-                  : 'bg-blue-200 text-blue-600 cursor-not-allowed'
+                  : 'bg-sky-200 text-sky-600 cursor-not-allowed'
               }`}
             >
               {hasUnappliedChanges ? '⚠️ Apply Changes' : '✓ Filters Applied'}
             </button>
             <button
               onClick={handleReset}
-              className="px-6 py-3 bg-white text-blue-700 rounded-xl font-bold border-2 border-blue-300 hover:border-red-500 hover:text-red-600 transition-all"
+              className="px-6 py-3 bg-white text-sky-700 rounded-xl font-bold border-2 border-sky-300 hover:border-red-400 hover:text-red-500 transition-all"
             >
               Reset
             </button>

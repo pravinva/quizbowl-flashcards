@@ -175,8 +175,8 @@ export default function FlashcardGame({ category, onBack, onCategoryChange, init
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-4 border-blue-600 border-t-transparent"></div>
-        <p className="mt-4 text-xl font-semibold" style={{ color: '#2563eb' }}>
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-4 border-sky-400 border-t-transparent"></div>
+        <p className="mt-4 text-xl font-semibold" style={{ color: '#0284c7' }}>
           Loading bonuses...
         </p>
       </div>
@@ -186,15 +186,15 @@ export default function FlashcardGame({ category, onBack, onCategoryChange, init
   if (bonuses.length === 0) {
     return (
       <div className="text-center py-12 px-4">
-        <p className="text-xl font-semibold mb-8" style={{ color: '#2563eb' }}>
+        <p className="text-xl font-semibold mb-8" style={{ color: '#0284c7' }}>
           No bonuses available for this category yet.
         </p>
-        <p className="text-lg mb-8" style={{ color: '#3b82f6' }}>
-          Run <code className="bg-blue-100 px-3 py-1.5 rounded-lg font-mono text-sm" style={{ color: '#1e40af' }}>npm run fetch-data</code> to download bonuses from QBReader.
+        <p className="text-lg mb-8" style={{ color: '#0ea5e9' }}>
+          Run <code className="bg-sky-100 px-3 py-1.5 rounded-lg font-mono text-sm" style={{ color: '#0c4a6e' }}>npm run fetch-data</code> to download bonuses from QBReader.
         </p>
         <button
           onClick={onBack}
-          className="px-6 py-3 bg-gradient-to-r from-blue-600 to-purple-600 text-white rounded-lg hover:from-blue-700 hover:to-purple-700 transition-all shadow-md font-semibold"
+          className="px-6 py-3 bg-gradient-to-r from-sky-400 to-purple-400 text-white rounded-lg hover:from-sky-500 hover:to-purple-500 transition-all shadow-md font-semibold"
         >
           Back to Categories
         </button>
@@ -233,7 +233,7 @@ export default function FlashcardGame({ category, onBack, onCategoryChange, init
           {categories.map((cat) => {
             const isActive = cat.id === category;
             const categoryGradients: Record<string, string> = {
-              literature: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 100%)',
+              literature: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)',
               history: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
               science: 'linear-gradient(135deg, #8b5cf6 0%, #7c3aed 100%)',
               'fine-arts': 'linear-gradient(135deg, #ec4899 0%, #db2777 100%)',
@@ -246,7 +246,7 @@ export default function FlashcardGame({ category, onBack, onCategoryChange, init
               'other-academic': 'linear-gradient(135deg, #a855f7 0%, #9333ea 100%)',
               'pop-culture': 'linear-gradient(135deg, #f97316 0%, #ea580c 100%)',
             };
-            const gradient = categoryGradients[cat.id] || 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 100%)';
+            const gradient = categoryGradients[cat.id] || 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 100%)';
             
             return (
               <button
@@ -271,11 +271,11 @@ export default function FlashcardGame({ category, onBack, onCategoryChange, init
       <div className="flex justify-between items-center">
         <button
           onClick={onBack}
-          className="px-4 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-r from-blue-500 to-purple-600 text-white rounded-full font-semibold hover:from-blue-600 hover:to-purple-700 shadow-md hover:shadow-lg transition-all duration-200 active:scale-95"
+          className="px-4 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-r from-sky-400 to-purple-400 text-white rounded-full font-semibold hover:from-sky-500 hover:to-purple-500 shadow-md hover:shadow-lg transition-all duration-200 active:scale-95"
         >
           ← Home
         </button>
-        <div className="px-5 py-2.5 bg-blue-600 text-white rounded-full font-semibold shadow-md">
+        <div className="px-5 py-2.5 bg-gradient-to-r from-sky-400 to-sky-500 text-white rounded-full font-semibold shadow-md">
           {currentIndex + 1} / {bonuses.length}
         </div>
       </div>
@@ -294,7 +294,7 @@ export default function FlashcardGame({ category, onBack, onCategoryChange, init
         <button
           onClick={handleNext}
           disabled={currentIndex === bonuses.length - 1}
-          className="flex-1 px-4 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-blue-600 to-blue-700 text-white rounded-xl font-semibold hover:from-blue-700 hover:to-blue-800 shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:from-blue-600 disabled:hover:to-blue-700 transition-all duration-200 active:scale-95"
+          className="flex-1 px-4 py-3 sm:px-8 sm:py-4 bg-gradient-to-r from-sky-400 to-sky-500 text-white rounded-xl font-semibold hover:from-sky-500 hover:to-sky-600 shadow-md hover:shadow-lg disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:from-sky-400 disabled:hover:to-sky-500 transition-all duration-200 active:scale-95"
         >
           Next ➡️
         </button>

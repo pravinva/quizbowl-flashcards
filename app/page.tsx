@@ -21,17 +21,17 @@ export default function Home() {
   };
 
   return (
-    <main className="min-h-screen px-4 py-6 sm:px-6 sm:py-8 md:px-12 md:py-12 lg:px-16 lg:py-16" style={{ background: 'linear-gradient(135deg, #eff6ff 0%, #dbeafe 50%, #bfdbfe 100%)' }}>
+    <main className="min-h-screen px-4 py-6 sm:px-6 sm:py-8 md:px-12 md:py-12 lg:px-16 lg:py-16" style={{ background: 'linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #bae6fd 100%)' }}>
       <div className="max-w-6xl mx-auto">
         {/* Header */}
         <div className="text-center mb-8 sm:mb-12">
-          <div className="inline-block mb-4 sm:mb-6 p-3 sm:p-4 rounded-3xl shadow-2xl" style={{ backgroundColor: '#2563eb' }}>
+          <div className="inline-block mb-4 sm:mb-6 p-3 sm:p-4 rounded-3xl shadow-2xl" style={{ background: 'linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)' }}>
             <span className="text-4xl sm:text-5xl md:text-6xl">🎓</span>
           </div>
-          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-3 sm:mb-4" style={{ color: '#1e40af' }}>
+          <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black mb-3 sm:mb-4" style={{ color: '#0c4a6e' }}>
             Quizbowl Flashcards
           </h1>
-          <p className="text-lg sm:text-xl md:text-2xl font-semibold px-2" style={{ color: '#3b82f6' }}>
+          <p className="text-lg sm:text-xl md:text-2xl font-semibold px-2" style={{ color: '#0284c7' }}>
             Master quizbowl bonuses with interactive practice
           </p>
         </div>
@@ -55,7 +55,7 @@ export default function Home() {
 
         {/* Credits Footer */}
         <div className="text-center mt-8 sm:mt-12 pb-4">
-          <p className="text-xs sm:text-sm" style={{ color: '#3b82f6' }}>
+          <p className="text-xs sm:text-sm" style={{ color: '#0284c7' }}>
             Created by Pravin using Claude Code and QBReader
           </p>
         </div>

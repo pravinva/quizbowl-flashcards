@@ -52,7 +52,7 @@ export default function SearchBar({ onSearch, onClear, placeholder = 'Ask anythi
       <div className={`flex flex-col sm:flex-row items-stretch sm:items-center gap-3 p-4 sm:p-4 rounded-xl border-2 transition-all ${
         isActive
           ? 'border-purple-500 bg-purple-50'
-          : 'border-blue-200 bg-white hover:border-purple-400'
+          : 'border-sky-200 bg-white hover:border-purple-300'
       }`}>
         <div className="flex items-center gap-3 flex-1">
           <span className="text-2xl sm:text-2xl">🔍</span>
@@ -74,7 +74,7 @@ export default function SearchBar({ onSearch, onClear, placeholder = 'Ask anythi
           <button
             onClick={executeSearch}
             disabled={query.trim().length < 2}
-            className="px-4 py-2.5 sm:px-3 sm:py-1.5 bg-blue-600 text-white text-sm sm:text-xs font-bold rounded-lg hover:bg-blue-700 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+            className="px-4 py-2.5 sm:px-3 sm:py-1.5 bg-gradient-to-r from-sky-400 to-sky-500 text-white text-sm sm:text-xs font-bold rounded-lg hover:from-sky-500 hover:to-sky-600 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
           >
             Search
           </button>
@@ -83,7 +83,7 @@ export default function SearchBar({ onSearch, onClear, placeholder = 'Ask anythi
             className={`px-4 py-2.5 sm:px-3 sm:py-1.5 text-sm sm:text-xs font-bold rounded-lg transition-all ${
               semanticMode
                 ? 'bg-purple-500 text-white'
-                : 'bg-blue-100 text-blue-700 hover:bg-blue-200'
+                : 'bg-sky-100 text-sky-700 hover:bg-sky-200'
             }`}
             title={semanticMode ? 'Using AI semantic search' : 'Using keyword search'}
           >

@@ -50,7 +50,7 @@ export default function Flashcard({ bonus }: FlashcardProps) {
       {/* Bonus metadata */}
       <div className="flex flex-col sm:flex-row flex-wrap gap-3 sm:gap-4 justify-between items-start sm:items-center">
         <div className="flex flex-wrap gap-2 sm:gap-3">
-          <div className="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-gradient-to-r from-blue-600 to-purple-600 rounded-xl text-white text-xs sm:text-sm font-bold shadow-xl">
+          <div className="px-3 py-1.5 sm:px-5 sm:py-2.5 bg-gradient-to-r from-sky-400 to-purple-400 rounded-xl text-white text-xs sm:text-sm font-bold shadow-xl">
             {bonus.category}
             {bonus.subcategory && ` • ${bonus.subcategory}`}
           </div>
@@ -76,7 +76,7 @@ export default function Flashcard({ bonus }: FlashcardProps) {
 
       {/* Lead-in - BLUE */}
       {bonus.leadin && (
-        <div className="p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-2xl transform hover:scale-[1.01] transition-all" style={{ backgroundColor: '#2563eb' }}>
+        <div className="p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-2xl transform hover:scale-[1.01] transition-all" style={{ background: 'linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)' }}>
           <div className="flex items-center gap-2 mb-3 sm:mb-4">
             <span className="text-xl sm:text-2xl">💡</span>
             <h3 className="text-lg sm:text-xl font-bold" style={{ color: '#ffffff' }}>Lead-in</h3>
@@ -126,7 +126,7 @@ export default function Flashcard({ bonus }: FlashcardProps) {
             >
               <div className={`p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-2xl transition-all transform flex flex-col items-center justify-center min-h-[180px] sm:min-h-[200px] ${
                 revealedAnswers.has(0) ? 'scale-[1.02]' : 'hover:scale-[1.01]'
-              }`} style={{ backgroundColor: '#2563eb' }}>
+              }`} style={{ background: 'linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)' }}>
                 <div className="flex items-center gap-2 mb-4 sm:mb-6">
                   <span className="text-xl sm:text-2xl">✅</span>
                   <h3 className="text-base sm:text-lg md:text-xl font-bold" style={{ color: '#ffffff' }}>Answer 1</h3>
@@ -185,7 +185,7 @@ export default function Flashcard({ bonus }: FlashcardProps) {
             >
               <div className={`p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-2xl transition-all transform flex flex-col items-center justify-center min-h-[180px] sm:min-h-[200px] ${
                 revealedAnswers.has(1) ? 'scale-[1.02]' : 'hover:scale-[1.01]'
-              }`} style={{ backgroundColor: '#2563eb' }}>
+              }`} style={{ background: 'linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)' }}>
                 <div className="flex items-center gap-2 mb-4 sm:mb-6">
                   <span className="text-xl sm:text-2xl">✅</span>
                   <h3 className="text-base sm:text-lg md:text-xl font-bold" style={{ color: '#ffffff' }}>Answer 2</h3>
@@ -244,7 +244,7 @@ export default function Flashcard({ bonus }: FlashcardProps) {
             >
               <div className={`p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-2xl transition-all transform flex flex-col items-center justify-center min-h-[180px] sm:min-h-[200px] ${
                 revealedAnswers.has(2) ? 'scale-[1.02]' : 'hover:scale-[1.01]'
-              }`} style={{ backgroundColor: '#2563eb' }}>
+              }`} style={{ background: 'linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)' }}>
                 <div className="flex items-center gap-2 mb-4 sm:mb-6">
                   <span className="text-xl sm:text-2xl">✅</span>
                   <h3 className="text-base sm:text-lg md:text-xl font-bold" style={{ color: '#ffffff' }}>Answer 3</h3>

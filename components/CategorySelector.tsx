@@ -58,8 +58,8 @@ export default function CategorySelector({
   if (loading) {
     return (
       <div className="text-center py-12">
-        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-4" style={{ borderColor: '#2563eb', borderTopColor: 'transparent' }}></div>
-        <p className="mt-4 text-xl font-bold" style={{ color: '#2563eb' }}>
+        <div className="inline-block animate-spin rounded-full h-12 w-12 border-b-4" style={{ borderColor: '#38bdf8', borderTopColor: 'transparent' }}></div>
+        <p className="mt-4 text-xl font-bold" style={{ color: '#0284c7' }}>
           Loading categories...
         </p>
       </div>
@@ -83,9 +83,9 @@ export default function CategorySelector({
 
   const categoryColors: Record<string, { gradient: string; text: string; hover: string }> = {
     literature: { 
-      gradient: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)', 
+      gradient: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%)', 
       text: '#ffffff',
-      hover: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)'
+      hover: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)'
     },
     history: { 
       gradient: 'linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%)', 
@@ -158,11 +158,11 @@ export default function CategorySelector({
 
   return (
     <div className="space-y-8">
-      <div className="text-center p-6 rounded-3xl shadow-xl" style={{ backgroundColor: '#2563eb' }}>
+      <div className="text-center p-6 rounded-3xl shadow-xl" style={{ background: 'linear-gradient(135deg, #38bdf8 0%, #0ea5e9 100%)' }}>
         <p className="text-2xl font-bold" style={{ color: '#ffffff' }}>
           Choose Your Category
         </p>
-        <p className="text-lg mt-2" style={{ color: '#bfdbfe' }}>
+        <p className="text-lg mt-2" style={{ color: '#e0f2fe' }}>
           Select a category to start practicing
         </p>
       </div>
@@ -179,9 +179,9 @@ export default function CategorySelector({
       <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
         {categories.map((category) => {
           const colors = categoryColors[category.id] || { 
-            gradient: 'linear-gradient(135deg, #2563eb 0%, #1d4ed8 50%, #1e40af 100%)', 
+            gradient: 'linear-gradient(135deg, #60a5fa 0%, #3b82f6 50%, #2563eb 100%)', 
             text: '#ffffff',
-            hover: 'linear-gradient(135deg, #1d4ed8 0%, #1e40af 50%, #1e3a8a 100%)'
+            hover: 'linear-gradient(135deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)'
           };
 
           return (
