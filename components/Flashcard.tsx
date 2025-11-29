@@ -94,42 +94,37 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
     const words = plainText.split(/(\s+)/).filter(w => w.trim().length > 0);
     let wordIndex = 0;
     let currentText = '';
+    let lastUpdateIndex = 0;
     
-    // Reset speech queue and state
-    speechQueueRef.current = [];
+    // Reset speech state
     isSpeakingRef.current = false;
 
-    const speakNextWord = () => {
-      if (speechQueueRef.current.length > 0 && synthRef.current && !isSpeakingRef.current) {
-        isSpeakingRef.current = true;
-        const word = speechQueueRef.current.shift()!;
-        
-        const utterance = new SpeechSynthesisUtterance(word);
-        const voice = getAmericanVoice();
-        if (voice) {
-          utterance.voice = voice;
-          utterance.lang = 'en-US';
-        }
-        utterance.rate = 1.0;
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
-        
-        utterance.onend = () => {
-          isSpeakingRef.current = false;
-          if (speechQueueRef.current.length > 0) {
-            speakNextWord();
-          }
-        };
-        
-        utterance.onerror = () => {
-          isSpeakingRef.current = false;
-          if (speechQueueRef.current.length > 0) {
-            speakNextWord();
-          }
-        };
-        
-        synthRef.current.speak(utterance);
+    const speakContinuously = (textToSpeak: string) => {
+      if (!synthRef.current || !textToSpeak.trim()) return;
+      
+      // Cancel current speech and start speaking the updated text
+      synthRef.current.cancel();
+      isSpeakingRef.current = true;
+      
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      const voice = getAmericanVoice();
+      if (voice) {
+        utterance.voice = voice;
+        utterance.lang = 'en-US';
       }
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+      
+      utterance.onend = () => {
+        isSpeakingRef.current = false;
+      };
+      
+      utterance.onerror = () => {
+        isSpeakingRef.current = false;
+      };
+      
+      synthRef.current.speak(utterance);
     };
 
     const stream = () => {
@@ -137,25 +132,37 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
         // Add next word
         const word = words[wordIndex];
         currentText += word + ' ';
-        setDisplayedText(currentText.trim());
+        const displayText = currentText.trim();
+        setDisplayedText(displayText);
         
-        // Queue word for speech only if TTS is enabled (skip if it's just whitespace)
-        const wordToSpeak = word.trim();
-        if (wordToSpeak && useTTS) {
-          speechQueueRef.current.push(wordToSpeak);
-          if (!isSpeakingRef.current) {
-            speakNextWord();
+        // Update speech continuously if TTS is enabled
+        if (useTTS) {
+          // Update speech at punctuation marks or every 4 words for smooth continuous reading
+          const hasPunctuation = word.match(/[.!?;:,]$/);
+          const shouldUpdate = hasPunctuation || (wordIndex - lastUpdateIndex >= 4) || wordIndex === words.length - 1;
+          
+          if (shouldUpdate) {
+            // Speak the full accumulated text continuously
+            speakContinuously(displayText);
+            lastUpdateIndex = wordIndex;
+          } else if (wordIndex === 0) {
+            // Start speaking from the beginning
+            speakContinuously(displayText);
+            lastUpdateIndex = 0;
           }
         }
         
         wordIndex++;
-        // Calculate delay based on word length and speech timing
+        // Calculate delay based on word length
         const wordLength = word.length;
-        // Base delay + extra time for longer words
         const delay = speed + (wordLength > 5 ? wordLength * 2 : 0);
         timeoutRef.current = setTimeout(stream, delay);
       } else {
         setIsStreaming(false);
+        // Ensure final text is spoken
+        if (useTTS && currentText.trim()) {
+          speakContinuously(currentText.trim());
+        }
       }
     };
 
@@ -313,7 +320,7 @@ export default function Flashcard({ bonus }: FlashcardProps) {
               </div>
               {revealedQuestions.has(0) ? (
                 <div
-                  className="text-base sm:text-lg md:text-xl leading-relaxed font-medium text-center tracking-wide px-2"
+                  className="text-base sm:text-lg md:text-xl leading-relaxed font-medium text-left tracking-wide px-2"
                   style={{ color: '#1e3a8a' }}
                 >
                   {streamingQuestion1.displayedText}
@@ -376,7 +383,7 @@ export default function Flashcard({ bonus }: FlashcardProps) {
               </div>
               {revealedQuestions.has(1) ? (
                 <div
-                  className="text-base sm:text-lg md:text-xl leading-relaxed font-medium text-center tracking-wide px-2"
+                  className="text-base sm:text-lg md:text-xl leading-relaxed font-medium text-left tracking-wide px-2"
                   style={{ color: '#14532d' }}
                 >
                   {streamingQuestion2.displayedText}
@@ -439,7 +446,7 @@ export default function Flashcard({ bonus }: FlashcardProps) {
               </div>
               {revealedQuestions.has(2) ? (
                 <div
-                  className="text-base sm:text-lg md:text-xl leading-relaxed font-medium text-center tracking-wide px-2"
+                  className="text-base sm:text-lg md:text-xl leading-relaxed font-medium text-left tracking-wide px-2"
                   style={{ color: '#7f1d1d' }}
                 >
                   {streamingQuestion3.displayedText}
