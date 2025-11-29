@@ -122,13 +122,11 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
       
       utterance.onend = () => {
         isSpeakingRef.current = false;
-        // Check if there's more accumulated text to read
+        // Check if there's more accumulated text to read - continue immediately without delay
         const currentAccumulatedText = currentTextRef.current.trim();
         if (currentAccumulatedText && currentAccumulatedText.length > textToSpeak.length) {
-          // Continue reading from where we left off
-          setTimeout(() => {
-            speakContinuously(currentAccumulatedText, textToSpeak.length);
-          }, 50);
+          // Continue reading from where we left off - no delay for seamless transition
+          speakContinuously(currentAccumulatedText, textToSpeak.length);
         }
       };
       
@@ -151,9 +149,25 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
         
         // Start speaking when we have enough text, then continue reading chunks as they accumulate
         if (useTTS) {
-          // Start speaking after accumulating 5 words
-          if (!isSpeakingRef.current && wordIndex >= 4) {
+          // Start speaking after accumulating 10 words for smoother continuous reading
+          if (!isSpeakingRef.current && wordIndex >= 9) {
             speakContinuously(displayText, 0);
+            lastUpdateIndex = wordIndex;
+          }
+          // Update speech periodically while streaming to stay in sync (every 8-10 words)
+          else if (isSpeakingRef.current && (wordIndex - lastUpdateIndex >= 8)) {
+            // Check if we have significantly more text accumulated
+            const currentAccumulatedText = displayText;
+            if (currentAccumulatedText.length > lastSpokenText.length + 50) {
+              // Update with new accumulated text - cancel current and continue seamlessly
+              if (synthRef.current) {
+                synthRef.current.cancel();
+                isSpeakingRef.current = false;
+                // Continue immediately with updated text from where we left off
+                speakContinuously(currentAccumulatedText, lastSpokenText.length);
+                lastUpdateIndex = wordIndex;
+              }
+            }
           }
         }
         
