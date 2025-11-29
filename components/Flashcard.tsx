@@ -102,41 +102,31 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
     isSpeakingRef.current = false;
 
     const speakContinuously = (textToSpeak: string) => {
-      if (!synthRef.current || !textToSpeak.trim()) return;
+      if (!synthRef.current || !textToSpeak.trim() || isSpeakingRef.current) return;
       
-      // Only start speaking if not already speaking
-      if (!isSpeakingRef.current) {
-        isSpeakingRef.current = true;
-        
-        const utterance = new SpeechSynthesisUtterance(textToSpeak);
-        const voice = getAmericanVoice();
-        if (voice) {
-          utterance.voice = voice;
-          utterance.lang = 'en-US';
-        }
-        utterance.rate = 1.0;
-        utterance.pitch = 1.0;
-        utterance.volume = 1.0;
-        
-        utterance.onend = () => {
-          isSpeakingRef.current = false;
-          // Check if there's more text accumulated while we were speaking
-          const currentAccumulatedText = currentTextRef.current.trim();
-          if (currentAccumulatedText && currentAccumulatedText.length > textToSpeak.length) {
-            // Continue reading the full accumulated text (not just remaining)
-            setTimeout(() => {
-              speakContinuously(currentAccumulatedText);
-            }, 50);
-          }
-        };
-        
-        utterance.onerror = () => {
-          isSpeakingRef.current = false;
-        };
-        
-        synthRef.current.speak(utterance);
-        lastSpokenText = textToSpeak;
+      isSpeakingRef.current = true;
+      
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      const voice = getAmericanVoice();
+      if (voice) {
+        utterance.voice = voice;
+        utterance.lang = 'en-US';
       }
+      utterance.rate = 1.0;
+      utterance.pitch = 1.0;
+      utterance.volume = 1.0;
+      
+      utterance.onend = () => {
+        isSpeakingRef.current = false;
+        // Don't restart - just finish reading
+      };
+      
+      utterance.onerror = () => {
+        isSpeakingRef.current = false;
+      };
+      
+      synthRef.current.speak(utterance);
+      lastSpokenText = textToSpeak;
     };
 
     const stream = () => {
@@ -148,28 +138,36 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
         currentTextRef.current = displayText; // Update ref for callback access
         setDisplayedText(displayText);
         
-        // Start speaking once when we have enough text (3 words), then let it continue without restarting
+        // Start speaking once when we have enough text, update only when streaming completes
         if (useTTS) {
-          // Start speaking after accumulating 3 words, then let it continue reading
-          if (!isSpeakingRef.current && wordIndex >= 2) {
+          // Start speaking after accumulating 5 words - read once
+          if (!isSpeakingRef.current && wordIndex >= 4) {
             speakContinuously(displayText);
-            lastUpdateIndex = wordIndex;
           }
-          // Don't restart - let the onend callback handle continuing with accumulated text
         }
         
         wordIndex++;
-        // Calculate delay for 125 WPM: 60,000ms / 125 words = 480ms per word
+        // Calculate delay for 140 WPM: 60,000ms / 140 words = 429ms per word
         // Adjust slightly based on word length for natural pacing
         const wordLength = word.length;
-        const baseDelay = speed; // speed should be ~480ms for 125 WPM
+        const baseDelay = speed; // speed should be ~429ms for 140 WPM
         const delay = baseDelay + (wordLength > 8 ? wordLength * 1 : 0); // Minimal adjustment for very long words
         timeoutRef.current = setTimeout(stream, delay);
       } else {
         setIsStreaming(false);
-        // Ensure final text is spoken if streaming completes and speech isn't already running
-        if (useTTS && currentText.trim() && !isSpeakingRef.current) {
-          speakContinuously(currentText.trim());
+        // Update speech with final complete text if it's different from what's being spoken
+        if (useTTS && currentText.trim()) {
+          const finalText = currentText.trim();
+          // Only update if we haven't spoken the full text yet
+          if (!isSpeakingRef.current || finalText.length > lastSpokenText.length) {
+            if (synthRef.current && isSpeakingRef.current) {
+              synthRef.current.cancel();
+              isSpeakingRef.current = false;
+            }
+            setTimeout(() => {
+              speakContinuously(finalText);
+            }, 50);
+          }
         }
       }
     };
@@ -204,23 +202,23 @@ export default function Flashcard({ bonus }: FlashcardProps) {
   const [readAloudEnabled, setReadAloudEnabled] = useState(false);
   
   // Streaming states for each question part
-  // Speed: 480ms per word = 125 WPM (60,000ms / 125 words = 480ms)
+  // Speed: 429ms per word = 140 WPM (60,000ms / 140 words = 429ms)
   const streamingQuestion1 = useStreamingText(
     bonus.parts[0]?.question || '',
     revealedQuestions.has(0),
-    480,
+    429,
     readAloudEnabled
   );
   const streamingQuestion2 = useStreamingText(
     bonus.parts[1]?.question || '',
     revealedQuestions.has(1),
-    480,
+    429,
     readAloudEnabled
   );
   const streamingQuestion3 = useStreamingText(
     bonus.parts[2]?.question || '',
     revealedQuestions.has(2),
-    480,
+    429,
     readAloudEnabled
   );
 
