@@ -1,15 +1,212 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import type { Bonus } from '@/types/quizbowl';
 
 interface FlashcardProps {
   bonus: Bonus;
 }
 
+// Helper function to strip HTML tags and get plain text
+function stripHtml(html: string): string {
+  const tmp = document.createElement('DIV');
+  tmp.innerHTML = html;
+  return tmp.textContent || tmp.innerText || '';
+}
+
+// Get neutral American English voice
+function getAmericanVoice(): SpeechSynthesisVoice | null {
+  if (typeof window === 'undefined' || !window.speechSynthesis) {
+    return null;
+  }
+  
+  const voices = window.speechSynthesis.getVoices();
+  // Prefer US English voices, prioritize neutral-sounding ones
+  const preferredVoices = [
+    'en-US',
+    'en_US',
+    'Google US English',
+    'Microsoft Zira - English (United States)',
+    'Alex',
+    'Samantha'
+  ];
+  
+  // Try to find a preferred voice
+  for (const preferred of preferredVoices) {
+    const voice = voices.find(v => 
+      v.lang.startsWith('en-US') && 
+      (v.name.includes(preferred) || v.name === preferred)
+    );
+    if (voice) return voice;
+  }
+  
+  // Fallback to any US English voice
+  const usVoice = voices.find(v => v.lang.startsWith('en-US'));
+  if (usVoice) return usVoice;
+  
+  // Fallback to any English voice
+  return voices.find(v => v.lang.startsWith('en')) || null;
+}
+
+// Streaming text hook with optional synchronized TTS
+function useStreamingText(text: string, enabled: boolean, speed: number = 100, useTTS: boolean = false) {
+  const [displayedText, setDisplayedText] = useState('');
+  const [isStreaming, setIsStreaming] = useState(false);
+  const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
+  const synthRef = useRef<SpeechSynthesis | null>(null);
+  const speechQueueRef = useRef<string[]>([]);
+  const isSpeakingRef = useRef<boolean>(false);
+
+  useEffect(() => {
+    // Initialize speech synthesis
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      synthRef.current = window.speechSynthesis;
+    }
+
+    // Stop speech if TTS is disabled
+    if (!useTTS && synthRef.current) {
+      synthRef.current.cancel();
+      speechQueueRef.current = [];
+      isSpeakingRef.current = false;
+    }
+
+    if (!enabled) {
+      setDisplayedText('');
+      setIsStreaming(false);
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      // Stop any ongoing speech
+      if (synthRef.current) {
+        synthRef.current.cancel();
+      }
+      speechQueueRef.current = [];
+      isSpeakingRef.current = false;
+      return;
+    }
+
+    setIsStreaming(true);
+    setDisplayedText('');
+    const plainText = stripHtml(text);
+    
+    // Split text into words for word-by-word streaming
+    const words = plainText.split(/(\s+)/).filter(w => w.trim().length > 0);
+    let wordIndex = 0;
+    let currentText = '';
+    
+    // Reset speech queue and state
+    speechQueueRef.current = [];
+    isSpeakingRef.current = false;
+
+    const speakNextWord = () => {
+      if (speechQueueRef.current.length > 0 && synthRef.current && !isSpeakingRef.current) {
+        isSpeakingRef.current = true;
+        const word = speechQueueRef.current.shift()!;
+        
+        const utterance = new SpeechSynthesisUtterance(word);
+        const voice = getAmericanVoice();
+        if (voice) {
+          utterance.voice = voice;
+          utterance.lang = 'en-US';
+        }
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        
+        utterance.onend = () => {
+          isSpeakingRef.current = false;
+          if (speechQueueRef.current.length > 0) {
+            speakNextWord();
+          }
+        };
+        
+        utterance.onerror = () => {
+          isSpeakingRef.current = false;
+          if (speechQueueRef.current.length > 0) {
+            speakNextWord();
+          }
+        };
+        
+        synthRef.current.speak(utterance);
+      }
+    };
+
+    const stream = () => {
+      if (wordIndex < words.length) {
+        // Add next word
+        const word = words[wordIndex];
+        currentText += word + ' ';
+        setDisplayedText(currentText.trim());
+        
+        // Queue word for speech only if TTS is enabled (skip if it's just whitespace)
+        const wordToSpeak = word.trim();
+        if (wordToSpeak && useTTS) {
+          speechQueueRef.current.push(wordToSpeak);
+          if (!isSpeakingRef.current) {
+            speakNextWord();
+          }
+        }
+        
+        wordIndex++;
+        // Calculate delay based on word length and speech timing
+        const wordLength = word.length;
+        // Base delay + extra time for longer words
+        const delay = speed + (wordLength > 5 ? wordLength * 2 : 0);
+        timeoutRef.current = setTimeout(stream, delay);
+      } else {
+        setIsStreaming(false);
+      }
+    };
+
+    // Load voices if needed (some browsers need this)
+    if (synthRef.current && synthRef.current.getVoices().length === 0) {
+      synthRef.current.addEventListener('voiceschanged', () => {
+        stream();
+      }, { once: true });
+    } else {
+      stream();
+    }
+
+    return () => {
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
+      }
+      if (synthRef.current) {
+        synthRef.current.cancel();
+      }
+      speechQueueRef.current = [];
+      isSpeakingRef.current = false;
+    };
+  }, [text, enabled, speed, useTTS]);
+
+  return { displayedText, isStreaming };
+}
+
 export default function Flashcard({ bonus }: FlashcardProps) {
   const [revealedQuestions, setRevealedQuestions] = useState<Set<number>>(new Set());
   const [revealedAnswers, setRevealedAnswers] = useState<Set<number>>(new Set());
+  const [readAloudEnabled, setReadAloudEnabled] = useState(false);
+  
+  // Streaming states for each question part
+  const streamingQuestion1 = useStreamingText(
+    bonus.parts[0]?.question || '',
+    revealedQuestions.has(0),
+    30,
+    readAloudEnabled
+  );
+  const streamingQuestion2 = useStreamingText(
+    bonus.parts[1]?.question || '',
+    revealedQuestions.has(1),
+    30,
+    readAloudEnabled
+  );
+  const streamingQuestion3 = useStreamingText(
+    bonus.parts[2]?.question || '',
+    revealedQuestions.has(2),
+    30,
+    readAloudEnabled
+  );
 
   const toggleQuestion = (partIndex: number) => {
     const newRevealed = new Set(revealedQuestions);
@@ -58,7 +255,7 @@ export default function Flashcard({ bonus }: FlashcardProps) {
             📅 {bonus.set.name} ({bonus.set.year})
           </div>
         </div>
-        <div className="flex gap-2 sm:gap-3 w-full sm:w-auto">
+        <div className="flex gap-2 sm:gap-3 w-full sm:w-auto flex-wrap">
           <button
             onClick={revealAll}
             className="flex-1 sm:flex-none px-3 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-r from-green-600 to-emerald-600 text-white text-xs sm:text-sm font-bold rounded-xl hover:from-green-700 hover:to-emerald-700 shadow-xl transition-all transform hover:scale-105 active:scale-95"
@@ -70,6 +267,16 @@ export default function Flashcard({ bonus }: FlashcardProps) {
             className="flex-1 sm:flex-none px-3 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-r from-indigo-600 to-purple-600 text-white text-xs sm:text-sm font-bold rounded-xl hover:from-indigo-700 hover:to-purple-700 shadow-xl transition-all transform hover:scale-105 active:scale-95"
           >
             Hide All
+          </button>
+          <button
+            onClick={() => setReadAloudEnabled(!readAloudEnabled)}
+            className={`flex-1 sm:flex-none px-3 py-2 sm:px-5 sm:py-2.5 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xl transition-all transform hover:scale-105 active:scale-95 ${
+              readAloudEnabled
+                ? 'bg-gradient-to-r from-red-600 to-pink-600 hover:from-red-700 hover:to-pink-700'
+                : 'bg-gradient-to-r from-gray-600 to-gray-700 hover:from-gray-700 hover:to-gray-800'
+            }`}
+          >
+            {readAloudEnabled ? '🔊 Reading Aloud' : '🔇 Read Aloud'}
           </button>
         </div>
       </div>
@@ -108,8 +315,12 @@ export default function Flashcard({ bonus }: FlashcardProps) {
                 <div
                   className="text-base sm:text-lg md:text-xl leading-relaxed font-medium text-center tracking-wide px-2"
                   style={{ color: '#1e3a8a' }}
-                  dangerouslySetInnerHTML={{ __html: bonus.parts[0].question }}
-                />
+                >
+                  {streamingQuestion1.displayedText}
+                  {streamingQuestion1.isStreaming && (
+                    <span className="animate-pulse">|</span>
+                  )}
+                </div>
               ) : (
                 <p className="text-center text-base sm:text-lg md:text-xl font-medium animate-pulse tracking-wide px-2" style={{ color: '#1e3a8a' }}>
                   👆 Click to reveal question
@@ -167,8 +378,12 @@ export default function Flashcard({ bonus }: FlashcardProps) {
                 <div
                   className="text-base sm:text-lg md:text-xl leading-relaxed font-medium text-center tracking-wide px-2"
                   style={{ color: '#14532d' }}
-                  dangerouslySetInnerHTML={{ __html: bonus.parts[1].question }}
-                />
+                >
+                  {streamingQuestion2.displayedText}
+                  {streamingQuestion2.isStreaming && (
+                    <span className="animate-pulse">|</span>
+                  )}
+                </div>
               ) : (
                 <p className="text-center text-base sm:text-lg md:text-xl font-medium animate-pulse tracking-wide px-2" style={{ color: '#14532d' }}>
                   👆 Click to reveal question
@@ -226,8 +441,12 @@ export default function Flashcard({ bonus }: FlashcardProps) {
                 <div
                   className="text-base sm:text-lg md:text-xl leading-relaxed font-medium text-center tracking-wide px-2"
                   style={{ color: '#7f1d1d' }}
-                  dangerouslySetInnerHTML={{ __html: bonus.parts[2].question }}
-                />
+                >
+                  {streamingQuestion3.displayedText}
+                  {streamingQuestion3.isStreaming && (
+                    <span className="animate-pulse">|</span>
+                  )}
+                </div>
               ) : (
                 <p className="text-center text-base sm:text-lg md:text-xl font-medium animate-pulse tracking-wide px-2" style={{ color: '#7f1d1d' }}>
                   👆 Click to reveal question
