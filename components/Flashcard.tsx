@@ -135,15 +135,22 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
         const displayText = currentText.trim();
         setDisplayedText(displayText);
         
-        // Update speech continuously if TTS is enabled
+        // Update speech continuously if TTS is enabled - sync with streaming
         if (useTTS) {
-          // Update speech at punctuation marks or every 4 words for smooth continuous reading
+          // Update speech every word or at punctuation for synchronized continuous reading
           const hasPunctuation = word.match(/[.!?;:,]$/);
-          const shouldUpdate = hasPunctuation || (wordIndex - lastUpdateIndex >= 4) || wordIndex === words.length - 1;
+          const shouldUpdate = hasPunctuation || (wordIndex - lastUpdateIndex >= 2) || wordIndex === words.length - 1;
           
           if (shouldUpdate) {
-            // Speak the full accumulated text continuously
-            speakContinuously(displayText);
+            // Cancel current speech and speak the full accumulated text continuously
+            if (synthRef.current) {
+              synthRef.current.cancel();
+            }
+            isSpeakingRef.current = false;
+            // Small delay to ensure cancellation completes before speaking
+            setTimeout(() => {
+              speakContinuously(displayText);
+            }, 10);
             lastUpdateIndex = wordIndex;
           } else if (wordIndex === 0) {
             // Start speaking from the beginning
@@ -153,9 +160,11 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
         }
         
         wordIndex++;
-        // Calculate delay based on word length
+        // Calculate delay for 125 WPM: 60,000ms / 125 words = 480ms per word
+        // Adjust slightly based on word length for natural pacing
         const wordLength = word.length;
-        const delay = speed + (wordLength > 5 ? wordLength * 2 : 0);
+        const baseDelay = speed; // speed should be ~480ms for 125 WPM
+        const delay = baseDelay + (wordLength > 8 ? wordLength * 1 : 0); // Minimal adjustment for very long words
         timeoutRef.current = setTimeout(stream, delay);
       } else {
         setIsStreaming(false);
@@ -196,22 +205,23 @@ export default function Flashcard({ bonus }: FlashcardProps) {
   const [readAloudEnabled, setReadAloudEnabled] = useState(false);
   
   // Streaming states for each question part
+  // Speed: 480ms per word = 125 WPM (60,000ms / 125 words = 480ms)
   const streamingQuestion1 = useStreamingText(
     bonus.parts[0]?.question || '',
     revealedQuestions.has(0),
-    30,
+    480,
     readAloudEnabled
   );
   const streamingQuestion2 = useStreamingText(
     bonus.parts[1]?.question || '',
     revealedQuestions.has(1),
-    30,
+    480,
     readAloudEnabled
   );
   const streamingQuestion3 = useStreamingText(
     bonus.parts[2]?.question || '',
     revealedQuestions.has(2),
-    30,
+    480,
     readAloudEnabled
   );
 
@@ -311,7 +321,7 @@ export default function Flashcard({ bonus }: FlashcardProps) {
             onClick={() => toggleQuestion(0)}
             className="w-full"
           >
-            <div className={`p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-2xl transition-all transform flex flex-col items-center justify-center min-h-[180px] sm:min-h-[200px] ${
+            <div className={`p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-2xl transition-all transform flex flex-col ${revealedQuestions.has(0) ? 'items-start' : 'items-center'} justify-center min-h-[180px] sm:min-h-[200px] ${
               revealedQuestions.has(0) ? 'scale-[1.02]' : 'hover:scale-[1.01]'
             }`} style={{ backgroundColor: '#bfdbfe' }}>
               <div className="flex items-center gap-2 mb-4 sm:mb-6">
@@ -320,7 +330,7 @@ export default function Flashcard({ bonus }: FlashcardProps) {
               </div>
               {revealedQuestions.has(0) ? (
                 <div
-                  className="text-base sm:text-lg md:text-xl leading-relaxed font-medium text-left tracking-wide px-2"
+                  className="text-base sm:text-lg md:text-xl leading-relaxed font-medium text-left tracking-wide px-2 w-full"
                   style={{ color: '#1e3a8a' }}
                 >
                   {streamingQuestion1.displayedText}
@@ -374,7 +384,7 @@ export default function Flashcard({ bonus }: FlashcardProps) {
             onClick={() => toggleQuestion(1)}
             className="w-full"
           >
-            <div className={`p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-2xl transition-all transform flex flex-col items-center justify-center min-h-[180px] sm:min-h-[200px] ${
+            <div className={`p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-2xl transition-all transform flex flex-col ${revealedQuestions.has(1) ? 'items-start' : 'items-center'} justify-center min-h-[180px] sm:min-h-[200px] ${
               revealedQuestions.has(1) ? 'scale-[1.02]' : 'hover:scale-[1.01]'
             }`} style={{ backgroundColor: '#bbf7d0' }}>
               <div className="flex items-center gap-2 mb-4 sm:mb-6">
@@ -383,7 +393,7 @@ export default function Flashcard({ bonus }: FlashcardProps) {
               </div>
               {revealedQuestions.has(1) ? (
                 <div
-                  className="text-base sm:text-lg md:text-xl leading-relaxed font-medium text-left tracking-wide px-2"
+                  className="text-base sm:text-lg md:text-xl leading-relaxed font-medium text-left tracking-wide px-2 w-full"
                   style={{ color: '#14532d' }}
                 >
                   {streamingQuestion2.displayedText}
@@ -437,7 +447,7 @@ export default function Flashcard({ bonus }: FlashcardProps) {
             onClick={() => toggleQuestion(2)}
             className="w-full"
           >
-            <div className={`p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-2xl transition-all transform flex flex-col items-center justify-center min-h-[180px] sm:min-h-[200px] ${
+            <div className={`p-4 sm:p-6 md:p-8 rounded-2xl sm:rounded-3xl shadow-2xl transition-all transform flex flex-col ${revealedQuestions.has(2) ? 'items-start' : 'items-center'} justify-center min-h-[180px] sm:min-h-[200px] ${
               revealedQuestions.has(2) ? 'scale-[1.02]' : 'hover:scale-[1.01]'
             }`} style={{ backgroundColor: '#fecaca' }}>
               <div className="flex items-center gap-2 mb-4 sm:mb-6">
@@ -446,7 +456,7 @@ export default function Flashcard({ bonus }: FlashcardProps) {
               </div>
               {revealedQuestions.has(2) ? (
                 <div
-                  className="text-base sm:text-lg md:text-xl leading-relaxed font-medium text-left tracking-wide px-2"
+                  className="text-base sm:text-lg md:text-xl leading-relaxed font-medium text-left tracking-wide px-2 w-full"
                   style={{ color: '#7f1d1d' }}
                 >
                   {streamingQuestion3.displayedText}
