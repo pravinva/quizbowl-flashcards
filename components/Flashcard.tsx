@@ -101,12 +101,16 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
     // Reset speech state
     isSpeakingRef.current = false;
 
-    const speakContinuously = (textToSpeak: string) => {
+    const speakContinuously = (textToSpeak: string, startIndex: number = 0) => {
       if (!synthRef.current || !textToSpeak.trim() || isSpeakingRef.current) return;
+      
+      // Extract the text to speak (from startIndex onwards)
+      const textToRead = startIndex > 0 ? textToSpeak.substring(startIndex).trim() : textToSpeak.trim();
+      if (!textToRead) return;
       
       isSpeakingRef.current = true;
       
-      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      const utterance = new SpeechSynthesisUtterance(textToRead);
       const voice = getAmericanVoice();
       if (voice) {
         utterance.voice = voice;
@@ -118,7 +122,14 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
       
       utterance.onend = () => {
         isSpeakingRef.current = false;
-        // Don't restart - just finish reading
+        // Check if there's more accumulated text to read
+        const currentAccumulatedText = currentTextRef.current.trim();
+        if (currentAccumulatedText && currentAccumulatedText.length > textToSpeak.length) {
+          // Continue reading from where we left off
+          setTimeout(() => {
+            speakContinuously(currentAccumulatedText, textToSpeak.length);
+          }, 50);
+        }
       };
       
       utterance.onerror = () => {
@@ -138,11 +149,11 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
         currentTextRef.current = displayText; // Update ref for callback access
         setDisplayedText(displayText);
         
-        // Start speaking once when we have enough text, update only when streaming completes
+        // Start speaking when we have enough text, then continue reading chunks as they accumulate
         if (useTTS) {
-          // Start speaking after accumulating 5 words - read once
+          // Start speaking after accumulating 5 words
           if (!isSpeakingRef.current && wordIndex >= 4) {
-            speakContinuously(displayText);
+            speakContinuously(displayText, 0);
           }
         }
         
@@ -155,19 +166,14 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
         timeoutRef.current = setTimeout(stream, delay);
       } else {
         setIsStreaming(false);
-        // Update speech with final complete text if it's different from what's being spoken
+        // Ensure final text is read if streaming completes
         if (useTTS && currentText.trim()) {
           const finalText = currentText.trim();
-          // Only update if we haven't spoken the full text yet
-          if (!isSpeakingRef.current || finalText.length > lastSpokenText.length) {
-            if (synthRef.current && isSpeakingRef.current) {
-              synthRef.current.cancel();
-              isSpeakingRef.current = false;
-            }
-            setTimeout(() => {
-              speakContinuously(finalText);
-            }, 50);
+          // If not currently speaking, start reading the final text
+          if (!isSpeakingRef.current) {
+            speakContinuously(finalText, lastSpokenText.length);
           }
+          // If currently speaking, the onend callback will handle continuing with final text
         }
       }
     };
