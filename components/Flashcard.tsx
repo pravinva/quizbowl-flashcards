@@ -95,6 +95,7 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
     let wordIndex = 0;
     let currentText = '';
     let lastUpdateIndex = 0;
+    let lastSpokenText = '';
     
     // Reset speech state
     isSpeakingRef.current = false;
@@ -102,8 +103,10 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
     const speakContinuously = (textToSpeak: string) => {
       if (!synthRef.current || !textToSpeak.trim()) return;
       
-      // Cancel current speech and start speaking the updated text
-      synthRef.current.cancel();
+      // Only cancel if we're already speaking (to update with new text)
+      if (isSpeakingRef.current) {
+        synthRef.current.cancel();
+      }
       isSpeakingRef.current = true;
       
       const utterance = new SpeechSynthesisUtterance(textToSpeak);
@@ -125,6 +128,7 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
       };
       
       synthRef.current.speak(utterance);
+      lastSpokenText = textToSpeak;
     };
 
     const stream = () => {
@@ -135,27 +139,21 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
         const displayText = currentText.trim();
         setDisplayedText(displayText);
         
-        // Update speech continuously if TTS is enabled - sync with streaming
+        // Update speech smoothly if TTS is enabled - less frequent updates for smoother sync
         if (useTTS) {
-          // Update speech every word or at punctuation for synchronized continuous reading
           const hasPunctuation = word.match(/[.!?;:,]$/);
-          const shouldUpdate = hasPunctuation || (wordIndex - lastUpdateIndex >= 2) || wordIndex === words.length - 1;
+          const isLastWord = wordIndex === words.length - 1;
           
-          if (shouldUpdate) {
-            // Cancel current speech and speak the full accumulated text continuously
-            if (synthRef.current) {
-              synthRef.current.cancel();
-            }
-            isSpeakingRef.current = false;
-            // Small delay to ensure cancellation completes before speaking
-            setTimeout(() => {
-              speakContinuously(displayText);
-            }, 10);
-            lastUpdateIndex = wordIndex;
-          } else if (wordIndex === 0) {
-            // Start speaking from the beginning
+          // Start speaking on first word
+          if (wordIndex === 0) {
             speakContinuously(displayText);
             lastUpdateIndex = 0;
+          }
+          // Update speech at punctuation marks (natural pause points) or every 6-8 words
+          else if (hasPunctuation || (wordIndex - lastUpdateIndex >= 6)) {
+            // Update speech with accumulated text, but don't cancel if it's close to current position
+            speakContinuously(displayText);
+            lastUpdateIndex = wordIndex;
           }
         }
         
@@ -168,9 +166,13 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
         timeoutRef.current = setTimeout(stream, delay);
       } else {
         setIsStreaming(false);
-        // Ensure final text is spoken
+        // Ensure final text is spoken if streaming completes
         if (useTTS && currentText.trim()) {
-          speakContinuously(currentText.trim());
+          // Only update if we haven't already spoken the full text
+          const finalText = currentText.trim();
+          if (!isSpeakingRef.current || finalText.length > lastSpokenText.length) {
+            speakContinuously(finalText);
+          }
         }
       }
     };
