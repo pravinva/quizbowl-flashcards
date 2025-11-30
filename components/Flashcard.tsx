@@ -20,42 +20,59 @@ function removeBrackets(text: string): string {
   return text.replace(/\[[^\]]*\]/g, '').trim();
 }
 
-// Get neutral American English voice
-function getAmericanVoice(): SpeechSynthesisVoice | null {
+// Get voice by accent preference
+function getVoiceByAccent(accent: string = 'us'): SpeechSynthesisVoice | null {
   if (typeof window === 'undefined' || !window.speechSynthesis) {
     return null;
   }
   
   const voices = window.speechSynthesis.getVoices();
-  // Prefer US English voices, prioritize neutral-sounding ones
-  const preferredVoices = [
-    'en-US',
-    'en_US',
-    'Google US English',
-    'Microsoft Zira - English (United States)',
-    'Alex',
-    'Samantha'
-  ];
+  
+  // Define accent preferences
+  const accentPreferences: Record<string, { lang: string; preferredNames: string[] }> = {
+    us: {
+      lang: 'en-US',
+      preferredNames: ['Google US English', 'Microsoft Zira', 'Alex', 'Samantha', 'en-US']
+    },
+    uk: {
+      lang: 'en-GB',
+      preferredNames: ['Google UK English', 'Microsoft Hazel', 'Daniel', 'en-GB']
+    },
+    au: {
+      lang: 'en-AU',
+      preferredNames: ['Google Australian English', 'Microsoft Catherine', 'en-AU']
+    },
+    in: {
+      lang: 'en-IN',
+      preferredNames: ['Google Indian English', 'Microsoft Heera', 'en-IN']
+    },
+    ca: {
+      lang: 'en-CA',
+      preferredNames: ['Google Canadian English', 'en-CA']
+    }
+  };
+  
+  const preference = accentPreferences[accent] || accentPreferences.us;
   
   // Try to find a preferred voice
-  for (const preferred of preferredVoices) {
+  for (const preferredName of preference.preferredNames) {
     const voice = voices.find(v => 
-      v.lang.startsWith('en-US') && 
-      (v.name.includes(preferred) || v.name === preferred)
+      v.lang.startsWith(preference.lang) && 
+      (v.name.includes(preferredName) || v.name === preferredName)
     );
     if (voice) return voice;
   }
   
-  // Fallback to any US English voice
-  const usVoice = voices.find(v => v.lang.startsWith('en-US'));
-  if (usVoice) return usVoice;
+  // Fallback to any voice with the accent language
+  const accentVoice = voices.find(v => v.lang.startsWith(preference.lang));
+  if (accentVoice) return accentVoice;
   
-  // Fallback to any English voice
+  // Ultimate fallback to any English voice
   return voices.find(v => v.lang.startsWith('en')) || null;
 }
 
 // Streaming text hook with optional synchronized TTS
-function useStreamingText(text: string, enabled: boolean, speed: number = 100, useTTS: boolean = false) {
+function useStreamingText(text: string, enabled: boolean, speed: number = 100, useTTS: boolean = false, accent: string = 'us') {
   const [displayedText, setDisplayedText] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -116,10 +133,10 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
       isSpeakingRef.current = true;
       
       const utterance = new SpeechSynthesisUtterance(textWithoutBrackets);
-      const voice = getAmericanVoice();
+      const voice = getVoiceByAccent(accent);
       if (voice) {
         utterance.voice = voice;
-        utterance.lang = 'en-US';
+        utterance.lang = voice.lang;
       }
       utterance.rate = 1.0;
       utterance.pitch = 1.0;
@@ -162,17 +179,12 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
       }
     };
 
-    // If TTS is enabled, start speaking first, then start streaming after 1 second
+    // If TTS is enabled, start speaking first, then start streaming immediately
     if (useTTS && plainText.trim()) {
       // Start speaking the full text immediately
       speakContinuously(plainText);
-      
-      // Start streaming after 1 second delay
-      setTimeout(() => {
-        if (!streamingStarted) {
-          startStreaming();
-        }
-      }, 1000); // 1 second delay
+      // Start streaming immediately (no delay)
+      startStreaming();
     } else {
       // If TTS is disabled, start streaming immediately
       startStreaming();
@@ -188,7 +200,7 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
       speechQueueRef.current = [];
       isSpeakingRef.current = false;
     };
-  }, [text, enabled, speed, useTTS]);
+  }, [text, enabled, speed, useTTS, accent]);
 
   return { displayedText, isStreaming };
 }
@@ -197,6 +209,7 @@ export default function Flashcard({ bonus }: FlashcardProps) {
   const [revealedQuestions, setRevealedQuestions] = useState<Set<number>>(new Set());
   const [revealedAnswers, setRevealedAnswers] = useState<Set<number>>(new Set());
   const [readAloudEnabled, setReadAloudEnabled] = useState(false);
+  const [selectedAccent, setSelectedAccent] = useState<string>('us');
   
   // Streaming states for each question part
   // Speed: 353ms per word = 170 WPM (60,000ms / 170 words = 353ms)
@@ -204,19 +217,22 @@ export default function Flashcard({ bonus }: FlashcardProps) {
     bonus.parts[0]?.question || '',
     revealedQuestions.has(0),
     353,
-    readAloudEnabled
+    readAloudEnabled,
+    selectedAccent
   );
   const streamingQuestion2 = useStreamingText(
     bonus.parts[1]?.question || '',
     revealedQuestions.has(1),
     353,
-    readAloudEnabled
+    readAloudEnabled,
+    selectedAccent
   );
   const streamingQuestion3 = useStreamingText(
     bonus.parts[2]?.question || '',
     revealedQuestions.has(2),
     353,
-    readAloudEnabled
+    readAloudEnabled,
+    selectedAccent
   );
 
   const toggleQuestion = (partIndex: number) => {
@@ -233,12 +249,52 @@ export default function Flashcard({ bonus }: FlashcardProps) {
     setRevealedQuestions(newRevealed);
   };
 
+  // Function to speak answer text
+  const speakAnswer = (answerText: string) => {
+    if (!readAloudEnabled || !answerText) return;
+    
+    const synth = window.speechSynthesis;
+    if (!synth) return;
+    
+    // Remove HTML tags and brackets
+    const tmp = document.createElement('DIV');
+    tmp.innerHTML = answerText;
+    const plainText = tmp.textContent || tmp.innerText || '';
+    const textWithoutBrackets = removeBrackets(plainText);
+    
+    if (!textWithoutBrackets.trim()) return;
+    
+    // Cancel any ongoing speech when reading individual answers
+    if (synth.speaking) {
+      synth.cancel();
+    }
+    
+    const utterance = new SpeechSynthesisUtterance(textWithoutBrackets);
+    const voice = getVoiceByAccent(selectedAccent);
+    if (voice) {
+      utterance.voice = voice;
+      utterance.lang = voice.lang;
+    }
+    utterance.rate = 1.0;
+    utterance.pitch = 1.0;
+    utterance.volume = 1.0;
+    
+    synth.speak(utterance);
+  };
+
   const toggleAnswer = (partIndex: number) => {
     const newRevealed = new Set(revealedAnswers);
-    if (newRevealed.has(partIndex)) {
+    const wasRevealed = newRevealed.has(partIndex);
+    
+    if (wasRevealed) {
       newRevealed.delete(partIndex);
     } else {
       newRevealed.add(partIndex);
+      // Speak the answer when it's revealed
+      const answerText = bonus.parts[partIndex]?.answer;
+      if (answerText) {
+        speakAnswer(answerText);
+      }
     }
     setRevealedAnswers(newRevealed);
   };
@@ -246,6 +302,18 @@ export default function Flashcard({ bonus }: FlashcardProps) {
   const revealAll = () => {
     setRevealedQuestions(new Set([0, 1, 2]));
     setRevealedAnswers(new Set([0, 1, 2]));
+    
+    // Read all answers sequentially if read aloud is enabled
+    if (readAloudEnabled) {
+      const answers = bonus.parts.map(part => part?.answer).filter(Boolean);
+      answers.forEach((answer, index) => {
+        setTimeout(() => {
+          if (answer) {
+            speakAnswer(answer);
+          }
+        }, index * 2000); // 2 second delay between each answer
+      });
+    }
   };
 
   const hideAll = () => {
@@ -289,6 +357,19 @@ export default function Flashcard({ bonus }: FlashcardProps) {
           >
             {readAloudEnabled ? '🔊 Reading Aloud' : '🔇 Read Aloud'}
           </button>
+          {readAloudEnabled && (
+            <select
+              value={selectedAccent}
+              onChange={(e) => setSelectedAccent(e.target.value)}
+              className="flex-1 sm:flex-none px-3 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xl hover:from-blue-700 hover:to-indigo-700 transition-all transform hover:scale-105 active:scale-95 cursor-pointer"
+            >
+              <option value="us">🇺🇸 US English</option>
+              <option value="uk">🇬🇧 UK English</option>
+              <option value="au">🇦🇺 Australian</option>
+              <option value="in">🇮🇳 Indian</option>
+              <option value="ca">🇨🇦 Canadian</option>
+            </select>
+          )}
         </div>
       </div>
 
