@@ -95,9 +95,7 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
     const words = plainText.split(/(\s+)/).filter(w => w.trim().length > 0);
     let wordIndex = 0;
     let currentText = '';
-    let lastUpdateIndex = 0;
-    let lastSpokenText = '';
-    let spokenLength = 0; // Track how many characters have been spoken
+    let streamingStarted = false;
     
     // Reset speech state
     isSpeakingRef.current = false;
@@ -113,26 +111,12 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
         utterance.voice = voice;
         utterance.lang = 'en-US';
       }
-      // Match the streaming speed: 170 WPM = ~1.13x rate (170/150 = 1.13)
-      utterance.rate = 1.13;
+      utterance.rate = 1.0;
       utterance.pitch = 1.0;
       utterance.volume = 1.0;
       
       utterance.onend = () => {
         isSpeakingRef.current = false;
-        // Update spoken length to accumulate what we've read
-        spokenLength += textToSpeak.length;
-        
-        // Check if there's more accumulated text to read
-        const currentAccumulatedText = currentTextRef.current.trim();
-        if (currentAccumulatedText && currentAccumulatedText.length > spokenLength) {
-          // Only read the NEW text that hasn't been spoken yet
-          const remainingText = currentAccumulatedText.substring(spokenLength).trim();
-          if (remainingText) {
-            // Read only the remaining text, not the full accumulated text
-            speakContinuously(remainingText);
-          }
-        }
       };
       
       utterance.onerror = () => {
@@ -140,7 +124,11 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
       };
       
       synthRef.current.speak(utterance);
-      lastSpokenText = textToSpeak;
+    };
+
+    const startStreaming = () => {
+      streamingStarted = true;
+      stream();
     };
 
     const stream = () => {
@@ -152,18 +140,6 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
         currentTextRef.current = displayText; // Update ref for callback access
         setDisplayedText(displayText);
         
-        // Start speaking once when we have enough text, then let it continue naturally
-        // Similar to icc-quiz-cards: speak full text once and let it play through
-        if (useTTS) {
-          // Start speaking after accumulating 8-10 words (enough to start smoothly)
-          if (!isSpeakingRef.current && wordIndex >= 7) {
-            speakContinuously(displayText);
-            spokenLength = 0; // Reset when starting fresh
-          }
-          // Don't update mid-speech - let it continue naturally
-          // The onend callback will handle continuing with more text if needed
-        }
-        
         wordIndex++;
         // Calculate delay for 170 WPM: 60,000ms / 170 words = 353ms per word
         // Adjust slightly based on word length for natural pacing
@@ -173,22 +149,30 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
         timeoutRef.current = setTimeout(stream, delay);
       } else {
         setIsStreaming(false);
-        // Ensure final text is read if streaming completes
-        if (useTTS && currentText.trim()) {
-          const finalText = currentText.trim();
-          // Update with final text - will continue reading if already speaking
-          speakContinuously(finalText);
-        }
       }
     };
 
-    // Load voices if needed (some browsers need this)
-    if (synthRef.current && synthRef.current.getVoices().length === 0) {
-      synthRef.current.addEventListener('voiceschanged', () => {
-        stream();
-      }, { once: true });
+    // If TTS is enabled, start speaking first, then start streaming after 5 words
+    if (useTTS && plainText.trim()) {
+      // Start speaking the full text immediately
+      speakContinuously(plainText);
+      
+      // Calculate time for 5 words to be spoken
+      // Average speech rate: ~150 WPM at rate 1.0
+      // 5 words at 150 WPM = (5 / 150) * 60,000ms = 2,000ms
+      const wordsToWait = 5;
+      const averageWordsPerMinute = 150; // Standard reading speed
+      const delayFor5Words = (wordsToWait / averageWordsPerMinute) * 60 * 1000; // ~2000ms
+      
+      // Start streaming after 5 words have been spoken
+      setTimeout(() => {
+        if (!streamingStarted) {
+          startStreaming();
+        }
+      }, delayFor5Words);
     } else {
-      stream();
+      // If TTS is disabled, start streaming immediately
+      startStreaming();
     }
 
     return () => {
