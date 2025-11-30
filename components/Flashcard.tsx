@@ -122,10 +122,10 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
       
       utterance.onend = () => {
         isSpeakingRef.current = false;
-        // Check if there's more accumulated text to read - continue immediately without delay
+        // Check if there's more accumulated text to read - continue immediately with zero delay
         const currentAccumulatedText = currentTextRef.current.trim();
         if (currentAccumulatedText && currentAccumulatedText.length > textToSpeak.length) {
-          // Continue reading from where we left off - no delay for seamless transition
+          // Continue reading from where we left off - zero delay, immediate continuation
           speakContinuously(currentAccumulatedText, textToSpeak.length);
         }
       };
@@ -159,11 +159,11 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
             // Check if we have significantly more text accumulated
             const currentAccumulatedText = displayText;
             if (currentAccumulatedText.length > lastSpokenText.length + 50) {
-              // Update with new accumulated text - cancel current and continue seamlessly
+              // Update with new accumulated text - cancel current and continue with zero delay
               if (synthRef.current) {
                 synthRef.current.cancel();
                 isSpeakingRef.current = false;
-                // Continue immediately with updated text from where we left off
+                // Continue immediately with zero delay - direct call
                 speakContinuously(currentAccumulatedText, lastSpokenText.length);
                 lastUpdateIndex = wordIndex;
               }
