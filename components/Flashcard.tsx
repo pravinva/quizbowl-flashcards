@@ -102,12 +102,8 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
     isSpeakingRef.current = false;
 
     const speakContinuously = (textToSpeak: string) => {
-      if (!synthRef.current || !textToSpeak.trim()) return;
+      if (!synthRef.current || !textToSpeak.trim() || isSpeakingRef.current) return;
       
-      // Cancel any current speech to update with new text
-      if (isSpeakingRef.current) {
-        synthRef.current.cancel();
-      }
       isSpeakingRef.current = true;
       
       const utterance = new SpeechSynthesisUtterance(textToSpeak);
@@ -116,7 +112,8 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
         utterance.voice = voice;
         utterance.lang = 'en-US';
       }
-      utterance.rate = 1.0;
+      // Match the streaming speed: 170 WPM = ~1.13x rate (170/150 = 1.13)
+      utterance.rate = 1.13;
       utterance.pitch = 1.0;
       utterance.volume = 1.0;
       
@@ -125,8 +122,11 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
         // Check if there's more accumulated text to read
         const currentAccumulatedText = currentTextRef.current.trim();
         if (currentAccumulatedText && currentAccumulatedText.length > textToSpeak.length) {
-          // Continue reading the updated accumulated text
-          speakContinuously(currentAccumulatedText);
+          // Continue reading the remaining text
+          const remainingText = currentAccumulatedText.substring(textToSpeak.length).trim();
+          if (remainingText) {
+            speakContinuously(currentAccumulatedText);
+          }
         }
       };
       
@@ -147,19 +147,15 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
         currentTextRef.current = displayText; // Update ref for callback access
         setDisplayedText(displayText);
         
-        // Read continuously - update speech as text accumulates
+        // Start speaking once when we have enough text, then let it continue naturally
+        // Similar to icc-quiz-cards: speak full text once and let it play through
         if (useTTS) {
-          // Start speaking after accumulating 5 words
-          if (!isSpeakingRef.current && wordIndex >= 4) {
+          // Start speaking after accumulating 8-10 words (enough to start smoothly)
+          if (!isSpeakingRef.current && wordIndex >= 7) {
             speakContinuously(displayText);
-            lastUpdateIndex = wordIndex;
           }
-          // Update speech continuously every 3-4 words to stay in sync with streaming
-          else if (isSpeakingRef.current && (wordIndex - lastUpdateIndex >= 3)) {
-            // Update with full accumulated text for continuous reading
-            speakContinuously(displayText);
-            lastUpdateIndex = wordIndex;
-          }
+          // Don't update mid-speech - let it continue naturally
+          // The onend callback will handle continuing with more text if needed
         }
         
         wordIndex++;
