@@ -16,8 +16,13 @@ function stripHtml(html: string): string {
 
 // Helper function to remove pronunciation guides in brackets
 function removeBrackets(text: string): string {
-  // Remove content in brackets (e.g., pronunciation guides)
-  return text.replace(/\[[^\]]*\]/g, '').trim();
+  // Remove content in square brackets [like this]
+  let cleaned = text.replace(/\[[^\]]*\]/g, '');
+  // Remove content in parentheses (like this) - often used for pronunciation guides
+  cleaned = cleaned.replace(/\([^)]*\)/g, '');
+  // Clean up multiple spaces and trim
+  cleaned = cleaned.replace(/\s+/g, ' ').trim();
+  return cleaned;
 }
 
 // Get voice by accent preference
