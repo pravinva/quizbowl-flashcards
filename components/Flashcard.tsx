@@ -71,8 +71,31 @@ function getVoiceByAccent(accent: string = 'us'): SpeechSynthesisVoice | null {
   return voices.find(v => v.lang.startsWith('en')) || null;
 }
 
+// Map accents to Google Cloud TTS voice names
+function getAIVoiceName(accent: string): { voiceName: string; languageCode: string } {
+  const voiceMap: Record<string, { voiceName: string; languageCode: string }> = {
+    'us-female': { voiceName: 'en-US-Neural2-F', languageCode: 'en-US' }, // American female
+    'us-male': { voiceName: 'en-US-Neural2-D', languageCode: 'en-US' }, // American male
+    'uk-female': { voiceName: 'en-GB-Neural2-A', languageCode: 'en-GB' }, // UK female
+    'uk-male': { voiceName: 'en-GB-Neural2-B', languageCode: 'en-GB' }, // UK male
+    'au-female': { voiceName: 'en-AU-Neural2-A', languageCode: 'en-AU' }, // Australian female
+    'au-male': { voiceName: 'en-AU-Neural2-B', languageCode: 'en-AU' }, // Australian male
+    'in-female': { voiceName: 'en-IN-Neural2-A', languageCode: 'en-IN' }, // Indian female Zephyr
+    'in-male': { voiceName: 'en-IN-Neural2-B', languageCode: 'en-IN' }, // Indian male
+    'ca-female': { voiceName: 'en-CA-Neural2-A', languageCode: 'en-CA' }, // Canadian female
+    'ca-male': { voiceName: 'en-CA-Neural2-B', languageCode: 'en-CA' }, // Canadian male
+    // Legacy support for old accent values
+    us: { voiceName: 'en-US-Neural2-F', languageCode: 'en-US' },
+    uk: { voiceName: 'en-GB-Neural2-A', languageCode: 'en-GB' },
+    au: { voiceName: 'en-AU-Neural2-A', languageCode: 'en-AU' },
+    in: { voiceName: 'en-IN-Neural2-A', languageCode: 'en-IN' },
+    ca: { voiceName: 'en-CA-Neural2-A', languageCode: 'en-CA' }
+  };
+  return voiceMap[accent] || voiceMap['in-female']; // Default to Indian female
+}
+
 // Streaming text hook with optional synchronized TTS
-function useStreamingText(text: string, enabled: boolean, speed: number = 100, useTTS: boolean = false, accent: string = 'us') {
+function useStreamingText(text: string, enabled: boolean, speed: number = 100, useTTS: boolean = false, accent: string = 'in') {
   const [displayedText, setDisplayedText] = useState('');
   const [isStreaming, setIsStreaming] = useState(false);
   const timeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -81,6 +104,7 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
   const speechQueueRef = useRef<string[]>([]);
   const isSpeakingRef = useRef<boolean>(false);
   const currentTextRef = useRef<string>('');
+  const currentAudioRef = useRef<HTMLAudioElement | null>(null);
 
   useEffect(() => {
     // Initialize speech synthesis
@@ -123,8 +147,8 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
     // Reset speech state
     isSpeakingRef.current = false;
 
-    const speakContinuously = (textToSpeak: string) => {
-      if (!synthRef.current || !textToSpeak.trim() || isSpeakingRef.current) return;
+    const speakWithAI = async (textToSpeak: string) => {
+      if (!textToSpeak.trim() || isSpeakingRef.current) return;
       
       // Remove pronunciation guides in brackets before speaking
       const textWithoutBrackets = removeBrackets(textToSpeak);
@@ -132,7 +156,69 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
       
       isSpeakingRef.current = true;
       
-      const utterance = new SpeechSynthesisUtterance(textWithoutBrackets);
+      try {
+        const { voiceName, languageCode } = getAIVoiceName(accent);
+        
+        const response = await fetch('/api/text-to-speech', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            text: textWithoutBrackets,
+            voiceName,
+            languageCode,
+            speed: 1.0,
+          }),
+        });
+
+        if (!response.ok) {
+          throw new Error('Failed to generate AI voice');
+        }
+
+        const data = await response.json();
+        
+        // Convert base64 to audio blob
+        const audioBlob = await fetch(`data:audio/mp3;base64,${data.audioContent}`).then(r => r.blob());
+        const audioUrl = URL.createObjectURL(audioBlob);
+        
+        // Stop any current audio
+        if (currentAudioRef.current) {
+          currentAudioRef.current.pause();
+          currentAudioRef.current = null;
+        }
+        
+        // Play audio
+        const audio = new Audio(audioUrl);
+        currentAudioRef.current = audio;
+        
+        audio.onended = () => {
+          isSpeakingRef.current = false;
+          URL.revokeObjectURL(audioUrl);
+          currentAudioRef.current = null;
+        };
+        
+        audio.onerror = () => {
+          isSpeakingRef.current = false;
+          URL.revokeObjectURL(audioUrl);
+          currentAudioRef.current = null;
+        };
+        
+        await audio.play();
+      } catch (error) {
+        console.error('Error with AI voice, falling back to browser voice:', error);
+        isSpeakingRef.current = false;
+        // Fallback to browser voice
+        speakWithBrowser(textWithoutBrackets);
+      }
+    };
+
+    const speakWithBrowser = (textToSpeak: string) => {
+      if (!synthRef.current || !textToSpeak.trim()) return;
+      
+      isSpeakingRef.current = true;
+      
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
       const voice = getVoiceByAccent(accent);
       if (voice) {
         utterance.voice = voice;
@@ -151,6 +237,11 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
       };
       
       synthRef.current.speak(utterance);
+    };
+
+    const speakContinuously = (textToSpeak: string) => {
+      // Use AI voice by default
+      speakWithAI(textToSpeak);
     };
 
     const startStreaming = () => {
@@ -197,6 +288,10 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
       if (synthRef.current) {
         synthRef.current.cancel();
       }
+      if (currentAudioRef.current) {
+        currentAudioRef.current.pause();
+        currentAudioRef.current = null;
+      }
       speechQueueRef.current = [];
       isSpeakingRef.current = false;
     };
@@ -209,7 +304,7 @@ export default function Flashcard({ bonus }: FlashcardProps) {
   const [revealedQuestions, setRevealedQuestions] = useState<Set<number>>(new Set());
   const [revealedAnswers, setRevealedAnswers] = useState<Set<number>>(new Set());
   const [readAloudEnabled, setReadAloudEnabled] = useState(false);
-  const [selectedAccent, setSelectedAccent] = useState<string>('us');
+  const [selectedAccent, setSelectedAccent] = useState<string>('in-female'); // Default to Indian female
   
   // Streaming states for each question part
   // Speed: 353ms per word = 170 WPM (60,000ms / 170 words = 353ms)
@@ -249,12 +344,9 @@ export default function Flashcard({ bonus }: FlashcardProps) {
     setRevealedQuestions(newRevealed);
   };
 
-  // Function to speak answer text
-  const speakAnswer = (answerText: string) => {
+  // Function to speak answer text using AI voice
+  const speakAnswer = async (answerText: string) => {
     if (!readAloudEnabled || !answerText) return;
-    
-    const synth = window.speechSynthesis;
-    if (!synth) return;
     
     // Remove HTML tags and brackets
     const tmp = document.createElement('DIV');
@@ -264,22 +356,64 @@ export default function Flashcard({ bonus }: FlashcardProps) {
     
     if (!textWithoutBrackets.trim()) return;
     
-    // Cancel any ongoing speech when reading individual answers
-    if (synth.speaking) {
-      synth.cancel();
+    try {
+      const { voiceName, languageCode } = getAIVoiceName(selectedAccent);
+      
+      const response = await fetch('/api/text-to-speech', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          text: textWithoutBrackets,
+          voiceName,
+          languageCode,
+          speed: 1.0,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to generate AI voice');
+      }
+
+      const data = await response.json();
+      
+      // Convert base64 to audio blob
+      const audioBlob = await fetch(`data:audio/mp3;base64,${data.audioContent}`).then(r => r.blob());
+      const audioUrl = URL.createObjectURL(audioBlob);
+      
+      // Play audio
+      const audio = new Audio(audioUrl);
+      
+      audio.onended = () => {
+        URL.revokeObjectURL(audioUrl);
+      };
+      
+      audio.onerror = () => {
+        URL.revokeObjectURL(audioUrl);
+      };
+      
+      await audio.play();
+    } catch (error) {
+      console.error('Error with AI voice for answer:', error);
+      // Fallback to browser voice
+      const synth = window.speechSynthesis;
+      if (synth) {
+        if (synth.speaking) {
+          synth.cancel();
+        }
+        const utterance = new SpeechSynthesisUtterance(textWithoutBrackets);
+        const voice = getVoiceByAccent(selectedAccent);
+        if (voice) {
+          utterance.voice = voice;
+          utterance.lang = voice.lang;
+        }
+        utterance.rate = 1.0;
+        utterance.pitch = 1.0;
+        utterance.volume = 1.0;
+        synth.speak(utterance);
+      }
     }
-    
-    const utterance = new SpeechSynthesisUtterance(textWithoutBrackets);
-    const voice = getVoiceByAccent(selectedAccent);
-    if (voice) {
-      utterance.voice = voice;
-      utterance.lang = voice.lang;
-    }
-    utterance.rate = 1.0;
-    utterance.pitch = 1.0;
-    utterance.volume = 1.0;
-    
-    synth.speak(utterance);
   };
 
   const toggleAnswer = (partIndex: number) => {
@@ -363,11 +497,26 @@ export default function Flashcard({ bonus }: FlashcardProps) {
               onChange={(e) => setSelectedAccent(e.target.value)}
               className="flex-1 sm:flex-none px-3 py-2 sm:px-5 sm:py-2.5 bg-gradient-to-r from-blue-600 to-indigo-600 text-white text-xs sm:text-sm font-bold rounded-xl shadow-xl hover:from-blue-700 hover:to-indigo-700 transition-all transform hover:scale-105 active:scale-95 cursor-pointer"
             >
-              <option value="us">🇺🇸 US English</option>
-              <option value="uk">🇬🇧 UK English</option>
-              <option value="au">🇦🇺 Australian</option>
-              <option value="in">🇮🇳 Indian</option>
-              <option value="ca">🇨🇦 Canadian</option>
+              <optgroup label="🇺🇸 US English">
+                <option value="us-female">Female (Zephyr)</option>
+                <option value="us-male">Male</option>
+              </optgroup>
+              <optgroup label="🇬🇧 UK English">
+                <option value="uk-female">Female</option>
+                <option value="uk-male">Male</option>
+              </optgroup>
+              <optgroup label="🇦🇺 Australian">
+                <option value="au-female">Female</option>
+                <option value="au-male">Male</option>
+              </optgroup>
+              <optgroup label="🇮🇳 Indian">
+                <option value="in-female">Female (Zephyr)</option>
+                <option value="in-male">Male</option>
+              </optgroup>
+              <optgroup label="🇨🇦 Canadian">
+                <option value="ca-female">Female</option>
+                <option value="ca-male">Male</option>
+              </optgroup>
             </select>
           )}
         </div>
