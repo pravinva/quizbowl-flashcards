@@ -97,6 +97,7 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
     let currentText = '';
     let lastUpdateIndex = 0;
     let lastSpokenText = '';
+    let spokenLength = 0; // Track how many characters have been spoken
     
     // Reset speech state
     isSpeakingRef.current = false;
@@ -119,13 +120,17 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
       
       utterance.onend = () => {
         isSpeakingRef.current = false;
+        // Update spoken length to accumulate what we've read
+        spokenLength += textToSpeak.length;
+        
         // Check if there's more accumulated text to read
         const currentAccumulatedText = currentTextRef.current.trim();
-        if (currentAccumulatedText && currentAccumulatedText.length > textToSpeak.length) {
-          // Continue reading the remaining text
-          const remainingText = currentAccumulatedText.substring(textToSpeak.length).trim();
+        if (currentAccumulatedText && currentAccumulatedText.length > spokenLength) {
+          // Only read the NEW text that hasn't been spoken yet
+          const remainingText = currentAccumulatedText.substring(spokenLength).trim();
           if (remainingText) {
-            speakContinuously(currentAccumulatedText);
+            // Read only the remaining text, not the full accumulated text
+            speakContinuously(remainingText);
           }
         }
       };
@@ -153,6 +158,7 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
           // Start speaking after accumulating 8-10 words (enough to start smoothly)
           if (!isSpeakingRef.current && wordIndex >= 7) {
             speakContinuously(displayText);
+            spokenLength = 0; // Reset when starting fresh
           }
           // Don't update mid-speech - let it continue naturally
           // The onend callback will handle continuing with more text if needed
