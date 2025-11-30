@@ -152,24 +152,17 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
       }
     };
 
-    // If TTS is enabled, start speaking first, then start streaming after 5 words
+    // If TTS is enabled, start speaking first, then start streaming after 1 second
     if (useTTS && plainText.trim()) {
       // Start speaking the full text immediately
       speakContinuously(plainText);
       
-      // Calculate time for 5 words to be spoken
-      // Average speech rate: ~150 WPM at rate 1.0
-      // 5 words at 150 WPM = (5 / 150) * 60,000ms = 2,000ms
-      const wordsToWait = 5;
-      const averageWordsPerMinute = 150; // Standard reading speed
-      const delayFor5Words = (wordsToWait / averageWordsPerMinute) * 60 * 1000; // ~2000ms
-      
-      // Start streaming after 5 words have been spoken
+      // Start streaming after 1 second delay
       setTimeout(() => {
         if (!streamingStarted) {
           startStreaming();
         }
-      }, delayFor5Words);
+      }, 1000); // 1 second delay
     } else {
       // If TTS is disabled, start streaming immediately
       startStreaming();
