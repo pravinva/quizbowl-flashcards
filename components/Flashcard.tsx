@@ -101,16 +101,16 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
     // Reset speech state
     isSpeakingRef.current = false;
 
-    const speakContinuously = (textToSpeak: string, startIndex: number = 0) => {
-      if (!synthRef.current || !textToSpeak.trim() || isSpeakingRef.current) return;
+    const speakContinuously = (textToSpeak: string) => {
+      if (!synthRef.current || !textToSpeak.trim()) return;
       
-      // Extract the text to speak (from startIndex onwards)
-      const textToRead = startIndex > 0 ? textToSpeak.substring(startIndex).trim() : textToSpeak.trim();
-      if (!textToRead) return;
-      
+      // Cancel any current speech to update with new text
+      if (isSpeakingRef.current) {
+        synthRef.current.cancel();
+      }
       isSpeakingRef.current = true;
       
-      const utterance = new SpeechSynthesisUtterance(textToRead);
+      const utterance = new SpeechSynthesisUtterance(textToSpeak);
       const voice = getAmericanVoice();
       if (voice) {
         utterance.voice = voice;
@@ -122,11 +122,11 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
       
       utterance.onend = () => {
         isSpeakingRef.current = false;
-        // Check if there's more accumulated text to read - continue immediately with zero delay
+        // Check if there's more accumulated text to read
         const currentAccumulatedText = currentTextRef.current.trim();
         if (currentAccumulatedText && currentAccumulatedText.length > textToSpeak.length) {
-          // Continue reading from where we left off - zero delay, immediate continuation
-          speakContinuously(currentAccumulatedText, textToSpeak.length);
+          // Continue reading the updated accumulated text
+          speakContinuously(currentAccumulatedText);
         }
       };
       
@@ -147,35 +147,26 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
         currentTextRef.current = displayText; // Update ref for callback access
         setDisplayedText(displayText);
         
-        // Start speaking when we have enough text, then continue reading chunks as they accumulate
+        // Read continuously - update speech as text accumulates
         if (useTTS) {
-          // Start speaking after accumulating 10 words for smoother continuous reading
-          if (!isSpeakingRef.current && wordIndex >= 9) {
-            speakContinuously(displayText, 0);
+          // Start speaking after accumulating 5 words
+          if (!isSpeakingRef.current && wordIndex >= 4) {
+            speakContinuously(displayText);
             lastUpdateIndex = wordIndex;
           }
-          // Update speech periodically while streaming to stay in sync (every 8-10 words)
-          else if (isSpeakingRef.current && (wordIndex - lastUpdateIndex >= 8)) {
-            // Check if we have significantly more text accumulated
-            const currentAccumulatedText = displayText;
-            if (currentAccumulatedText.length > lastSpokenText.length + 50) {
-              // Update with new accumulated text - cancel current and continue with zero delay
-              if (synthRef.current) {
-                synthRef.current.cancel();
-                isSpeakingRef.current = false;
-                // Continue immediately with zero delay - direct call
-                speakContinuously(currentAccumulatedText, lastSpokenText.length);
-                lastUpdateIndex = wordIndex;
-              }
-            }
+          // Update speech continuously every 3-4 words to stay in sync with streaming
+          else if (isSpeakingRef.current && (wordIndex - lastUpdateIndex >= 3)) {
+            // Update with full accumulated text for continuous reading
+            speakContinuously(displayText);
+            lastUpdateIndex = wordIndex;
           }
         }
         
         wordIndex++;
-        // Calculate delay for 140 WPM: 60,000ms / 140 words = 429ms per word
+        // Calculate delay for 170 WPM: 60,000ms / 170 words = 353ms per word
         // Adjust slightly based on word length for natural pacing
         const wordLength = word.length;
-        const baseDelay = speed; // speed should be ~429ms for 140 WPM
+        const baseDelay = speed; // speed should be ~353ms for 170 WPM
         const delay = baseDelay + (wordLength > 8 ? wordLength * 1 : 0); // Minimal adjustment for very long words
         timeoutRef.current = setTimeout(stream, delay);
       } else {
@@ -183,11 +174,8 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
         // Ensure final text is read if streaming completes
         if (useTTS && currentText.trim()) {
           const finalText = currentText.trim();
-          // If not currently speaking, start reading the final text
-          if (!isSpeakingRef.current) {
-            speakContinuously(finalText, lastSpokenText.length);
-          }
-          // If currently speaking, the onend callback will handle continuing with final text
+          // Update with final text - will continue reading if already speaking
+          speakContinuously(finalText);
         }
       }
     };
@@ -222,23 +210,23 @@ export default function Flashcard({ bonus }: FlashcardProps) {
   const [readAloudEnabled, setReadAloudEnabled] = useState(false);
   
   // Streaming states for each question part
-  // Speed: 429ms per word = 140 WPM (60,000ms / 140 words = 429ms)
+  // Speed: 353ms per word = 170 WPM (60,000ms / 170 words = 353ms)
   const streamingQuestion1 = useStreamingText(
     bonus.parts[0]?.question || '',
     revealedQuestions.has(0),
-    429,
+    353,
     readAloudEnabled
   );
   const streamingQuestion2 = useStreamingText(
     bonus.parts[1]?.question || '',
     revealedQuestions.has(1),
-    429,
+    353,
     readAloudEnabled
   );
   const streamingQuestion3 = useStreamingText(
     bonus.parts[2]?.question || '',
     revealedQuestions.has(2),
-    429,
+    353,
     readAloudEnabled
   );
 
