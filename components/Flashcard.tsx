@@ -14,6 +14,12 @@ function stripHtml(html: string): string {
   return tmp.textContent || tmp.innerText || '';
 }
 
+// Helper function to remove pronunciation guides in brackets
+function removeBrackets(text: string): string {
+  // Remove content in brackets (e.g., pronunciation guides)
+  return text.replace(/\[[^\]]*\]/g, '').trim();
+}
+
 // Get neutral American English voice
 function getAmericanVoice(): SpeechSynthesisVoice | null {
   if (typeof window === 'undefined' || !window.speechSynthesis) {
@@ -103,9 +109,13 @@ function useStreamingText(text: string, enabled: boolean, speed: number = 100, u
     const speakContinuously = (textToSpeak: string) => {
       if (!synthRef.current || !textToSpeak.trim() || isSpeakingRef.current) return;
       
+      // Remove pronunciation guides in brackets before speaking
+      const textWithoutBrackets = removeBrackets(textToSpeak);
+      if (!textWithoutBrackets.trim()) return;
+      
       isSpeakingRef.current = true;
       
-      const utterance = new SpeechSynthesisUtterance(textToSpeak);
+      const utterance = new SpeechSynthesisUtterance(textWithoutBrackets);
       const voice = getAmericanVoice();
       if (voice) {
         utterance.voice = voice;
